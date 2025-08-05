@@ -19,7 +19,7 @@ public class SignupRequest {
     @NotBlank(message = "Name is Required")
     private String name;
 
-    private Role role;
+    private Role role = Role.BUYER; // default role
 
     public String getEmail() {
         return email;
