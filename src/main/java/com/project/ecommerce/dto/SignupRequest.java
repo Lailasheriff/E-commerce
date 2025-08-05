@@ -19,7 +19,6 @@ public class SignupRequest {
     @NotBlank(message = "Name is Required")
     private String name;
 
-    @NotBlank(message = "Role is required")
     private Role role;
 
     public String getEmail() {

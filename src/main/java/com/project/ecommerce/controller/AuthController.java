@@ -6,6 +6,7 @@ import com.project.ecommerce.dto.SignupRequest;
 import com.project.ecommerce.entity.Role;
 import com.project.ecommerce.entity.User;
 import com.project.ecommerce.repository.UserRepository;
+import com.project.ecommerce.service.JwtService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +27,9 @@ public class AuthController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private JwtService jwtService;
 
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@Valid @RequestBody SignupRequest signupRequest) {
@@ -70,7 +74,7 @@ public class AuthController {
             return  ResponseEntity.status(401).body("Invalid password!");
         }
 
-        String token = "token";
+        String token = jwtService.generateToken(user.getEmail());
 
         return ResponseEntity.ok(new AuthResponse(token));
     }
