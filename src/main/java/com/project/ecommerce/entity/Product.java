@@ -29,6 +29,9 @@ public class Product {
     @JoinColumn(name = "seller_id", nullable = false)
     private User seller;
 
+    @Column(name = "image_url")
+    private String imageUrl;
+
     @Column(name = "created_at")
     private Timestamp createdAt;
 
@@ -36,6 +39,15 @@ public class Product {
     private List<Review> reviews;
 
     public Product() {
+    }
+
+    public Product(String name, String description, BigDecimal price, int quantity, User seller, String imageUrl) {
+        this.name = name;
+        this.description = description;
+        this.price = price;
+        this.quantity = quantity;
+        this.seller = seller;
+        this.imageUrl = imageUrl;
     }
 
     public Product(String name, String description, BigDecimal price, int quantity, User seller) {
@@ -110,6 +122,14 @@ public class Product {
         this.id = id;
     }
 
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
     @Override
     public String toString() {
         return "Product{" +
@@ -119,6 +139,7 @@ public class Product {
                 ", price=" + price +
                 ", quantity=" + quantity +
                 ", seller=" + seller +
+                ", imageUrl='" + imageUrl + '\'' +
                 ", createdAt=" + createdAt +
                 ", reviews=" + reviews +
                 '}';
