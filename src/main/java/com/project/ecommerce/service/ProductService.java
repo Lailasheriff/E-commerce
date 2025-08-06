@@ -13,4 +13,5 @@ public interface ProductService {
     Page<ProductSummaryDTO> getAllProductSummaries(Pageable pageable);
     ProductDetailsDTO getProductDetailsWithReviews(Long productId);
     List<ProductDetailsDTO> searchProducts(String query);
+    List<ProductDetailsDTO> getAllProductDetailsSorted(String sortBy, String direction);
 }

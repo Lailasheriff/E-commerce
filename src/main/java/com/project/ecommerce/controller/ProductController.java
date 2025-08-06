@@ -32,6 +32,19 @@ public class ProductController {
         return productService.getAllProductSummaries(pageable);
     }
 
+    @GetMapping("/products/filter")
+    public ResponseEntity<List<ProductDetailsDTO>> getAllProductDetailsSorted(
+            @RequestParam(defaultValue = "name") String sortBy,
+            @RequestParam(defaultValue = "asc") String order
+    ) {
+        List<ProductDetailsDTO> products = productService.getAllProductDetailsSorted(sortBy, order);
+        return ResponseEntity.ok(products);
+    }
+
+
+
+
+
     @GetMapping("/products/{productId}")
     public ResponseEntity<ProductDetailsDTO> getProductDetailsWithReviews(@PathVariable Long productId) {
         ProductDetailsDTO productDetails = productService.getProductDetailsWithReviews(productId);

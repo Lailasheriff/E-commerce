@@ -16,6 +16,14 @@ public class ProductDetailsDTO {
 
     public ProductDetailsDTO() {}
 
+    public ProductDetailsDTO(Long id, String name, BigDecimal price, double averageRating, int quantityAvailable) {
+        this.id = id;
+        this.name = name;
+        this.price = price;
+        this.averageRating = averageRating;
+        this.quantityAvailable = quantityAvailable;
+    }
+
     public ProductDetailsDTO(Long id, String name, String description, BigDecimal price, int quantityAvailable, double averageRating, int totalReviews, List<ReviewDTO> reviewDTOS, String imageUrl) {
         this.id = id;
         this.name = name;

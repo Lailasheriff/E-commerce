@@ -14,6 +14,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -57,6 +59,45 @@ public class ProductServiceImpl implements ProductService{
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public List<ProductDetailsDTO> getAllProductDetailsSorted(String sortBy, String direction) {
+        List<Product> products = productRepository.findAll();
+
+
+        List<ProductDetailsDTO> detailedProducts = products.stream()
+                .map(product -> getProductDetailsWithReviews(product.getId()))
+                .collect(Collectors.toList());
+
+
+        Comparator<ProductDetailsDTO> comparator = getComparator(sortBy);
+
+        if (comparator != null) {
+            if ("desc".equalsIgnoreCase(direction)) {
+                comparator = comparator.reversed();
+            }
+            detailedProducts.sort(comparator);
+        }
+
+        return detailedProducts;
+    }
+
+    private Comparator<ProductDetailsDTO> getComparator(String sortBy) {
+        return switch (sortBy.toLowerCase()) {
+            case "id" -> Comparator.comparing(ProductDetailsDTO::getId,
+                    Comparator.nullsLast(Long::compareTo));
+            case "name" -> Comparator.comparing(ProductDetailsDTO::getName,
+                    Comparator.nullsLast(String::compareToIgnoreCase));
+            case "price" -> Comparator.comparing(ProductDetailsDTO::getPrice,
+                    Comparator.nullsLast(BigDecimal::compareTo));
+            case "averagerating" -> Comparator.comparing(ProductDetailsDTO::getAverageRating,
+                    Comparator.nullsLast(Double::compareTo));
+            case "quantity" -> Comparator.comparing(ProductDetailsDTO::getQuantityAvailable,
+                    Comparator.nullsLast(Integer::compareTo));
+            default -> null;
+        };
+    }
+
+
     private ProductDetailsDTO toProductDetailsDTO(Product product, List<Review> reviews) {
         ProductDetailsDTO dto = new ProductDetailsDTO();
         double averageRating = 0.0;
@@ -88,3 +129,7 @@ public class ProductServiceImpl implements ProductService{
         return dto;
     }
 }
+
+
+
+
