@@ -7,15 +7,13 @@ public class ProductSummaryDTO {
 
         private String name;
         private BigDecimal price;
-        private double averageRating;
         private String imageUrl;
 
     public ProductSummaryDTO() {}
 
-    public ProductSummaryDTO(String name, BigDecimal price, double averageRating, String imageUrl) {
+    public ProductSummaryDTO(String name, BigDecimal price, String imageUrl) {
         this.name = name;
         this.price = price;
-        this.averageRating = averageRating;
         this.imageUrl = imageUrl;
     }
 
@@ -36,13 +34,6 @@ public class ProductSummaryDTO {
         this.price = price;
     }
 
-    public double getAverageRating() {
-        return averageRating;
-    }
-
-    public void setAverageRating(double averageRating) {
-        this.averageRating = averageRating;
-    }
 
     public String getImageUrl() {
         return imageUrl;
