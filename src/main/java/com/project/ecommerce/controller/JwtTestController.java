@@ -1,5 +1,6 @@
 package com.project.ecommerce.controller;
 
+import com.project.ecommerce.entity.Role;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -19,12 +20,13 @@ public class JwtTestController {
 
     // 1. Generate token from username/email
     @GetMapping("/generate")
-    public Map<String, String> generateToken(@RequestParam String username) {
-        String token = jwtService.generateToken(username);
+    public Map<String, String> generateToken(@RequestParam Long id, @RequestParam Role role) {
+        String token = jwtService.generateToken(id, role);
         Map<String, String> response = new HashMap<>();
         response.put("token", token);
         return response;
     }
+
 
     // 2. Extract username from token
     @GetMapping("/extract")

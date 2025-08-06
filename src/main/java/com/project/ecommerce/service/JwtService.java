@@ -1,6 +1,7 @@
 package com.project.ecommerce.service;
 
 
+import com.project.ecommerce.entity.Role;
 import org.springframework.stereotype.Service;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
@@ -23,9 +24,10 @@ public class JwtService {
         return Keys.hmacShaKeyFor(jwtSecret.getBytes());
     }
 
-    public String generateToken(String email) {
+    public String generateToken(Long id, Role role) {
         return Jwts.builder()
-                .setSubject(email)
+                .setSubject(String.valueOf(id))
+                .claim("role", role.name())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + jwtExpiration))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
@@ -35,6 +37,18 @@ public class JwtService {
     public String extractEmail(String token) {
         return extractClaim(token, Claims::getSubject);
     }
+    public Long extractId(String token) {
+        String subject = extractClaim(token, Claims::getSubject); // "sub" is stored as String
+        return Long.parseLong(subject); // Convert to Long
+    }
+
+    public Role extractRole(String token) {
+        String roleStr = extractClaim(token, claims -> claims.get("role", String.class));
+        return Role.valueOf(roleStr); // Convert string back to enum
+    }
+
+
+
 
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
@@ -51,12 +65,16 @@ public class JwtService {
 
     public boolean isTokenValid(String token) {
         final String extractedEmail = extractEmail(token);
+        final Role extractedRole= extractRole(token);
+        final Long extractedId= extractId(token);
         boolean expired = isTokenExpired(token);
 
 
 
-        System.out.println("Extracted: " + extractedEmail);
-        System.out.println("Provided: " + extractedEmail);
+        System.out.println("Extracted Email: " + extractedEmail);
+        System.out.println("Extracted Role: " + extractedRole);
+        System.out.println("Extracted Id: " + extractedId);
+
         System.out.println("Token expired: " + expired);
 
 
