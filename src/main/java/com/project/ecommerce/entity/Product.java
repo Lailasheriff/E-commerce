@@ -1,9 +1,9 @@
 package com.project.ecommerce.entity;
 
 import jakarta.persistence.*;
-import java.sql.Timestamp;
-
 import java.math.BigDecimal;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -25,17 +25,30 @@ public class Product {
     @Column(name="quantity")
     private int quantity;
 
+    @Column(name = "created_at")
+    private LocalDateTime createdAt = LocalDateTime.now();
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seller_id", nullable = false)
     private User seller;
 
-    @Column(name = "created_at")
-    private Timestamp createdAt;
+    @Column(name = "image_url")
+    private String imageUrl;
+
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     private List<Review> reviews;
 
     public Product() {
+    }
+
+    public Product(String name, String description, BigDecimal price, int quantity, User seller, String imageUrl) {
+        this.name = name;
+        this.description = description;
+        this.price = price;
+        this.quantity = quantity;
+        this.seller = seller;
+        this.imageUrl = imageUrl;
     }
 
     public Product(String name, String description, BigDecimal price, int quantity, User seller) {
@@ -52,14 +65,6 @@ public class Product {
 
     public void setReviews(List<Review> reviews) {
         this.reviews = reviews;
-    }
-
-    public Timestamp getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Timestamp createdAt) {
-        this.createdAt = createdAt;
     }
 
     public User getSeller() {
@@ -110,6 +115,18 @@ public class Product {
         this.id = id;
     }
 
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
     @Override
     public String toString() {
         return "Product{" +
@@ -119,7 +136,7 @@ public class Product {
                 ", price=" + price +
                 ", quantity=" + quantity +
                 ", seller=" + seller +
-                ", createdAt=" + createdAt +
+                ", imageUrl='" + imageUrl + '\'' +
                 ", reviews=" + reviews +
                 '}';
     }

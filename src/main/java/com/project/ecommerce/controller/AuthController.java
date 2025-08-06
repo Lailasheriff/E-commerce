@@ -33,7 +33,6 @@ public class AuthController {
 
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@Valid @RequestBody SignupRequest signupRequest) {
-        System.out.println("Hi from signup");
         try {
             // get fields from request body
             String name = signupRequest.getName();
