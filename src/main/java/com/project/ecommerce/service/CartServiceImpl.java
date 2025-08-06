@@ -1,5 +1,7 @@
 package com.project.ecommerce.service;
 
+import com.project.ecommerce.dto.CartItemRequest;
+import com.project.ecommerce.dto.CartItemResponse;
 import com.project.ecommerce.entity.CartItem;
 import com.project.ecommerce.entity.Product;
 import com.project.ecommerce.entity.User;
@@ -8,11 +10,14 @@ import com.project.ecommerce.repository.ProductRepository;
 import com.project.ecommerce.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class CartServiceImpl implements CartService {
 
     private CartItemRepository cartItemRepository;
@@ -27,35 +32,154 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public List<CartItem> getCartItems(Long buyerId) {
-        return cartItemRepository.findByBuyerId(buyerId);
+    public List<CartItem> getCartItems(Long userId) {
+        System.out.println("Service: Getting cart items for user ID: " + userId);
+        User buyer = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        System.out.println("Service: Found user: " + buyer.getName());
+        List<CartItem> cartItems = cartItemRepository.findByBuyer(buyer);
+        System.out.println("Service: Found " + cartItems.size() + " cart items in database");
+        return cartItems;
     }
 
     @Override
-    public void addToCart(Long buyerId, Long productId, int quantity) {
+    public List<CartItemResponse> getCartItemsResponse(Long userId) {
+        List<CartItem> cartItems = getCartItems(userId);
+        return cartItems.stream()
+                .map(this::convertToCartItemResponse)
+                .collect(Collectors.toList());
+    }
 
-        User buyer = userRepository.findById(buyerId)
-                .orElseThrow(() -> new RuntimeException("Buyer not found"));
+    private CartItemResponse convertToCartItemResponse(CartItem cartItem) {
+        // Force loading of the product to avoid lazy loading issues
+        Product product = cartItem.getProduct();
+        return new CartItemResponse(
+                cartItem.getId(),
+                product.getId(),
+                product.getName(),
+                product.getPrice(),
+                cartItem.getQuantity()
+        );
+    }
+
+    @Override
+    @Transactional
+    public void addToCart(Long userId, CartItemRequest cartItemRequest) {
+        System.out.println("Service: Adding to cart - User ID: " + userId + ", Product ID: " + cartItemRequest.getProductId() + ", Quantity: " + cartItemRequest.getQuantity());
+        
+        User buyer = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        System.out.println("Service: Found user: " + buyer.getName() + " (ID: " + buyer.getId() + ")");
+        
+        Product product = productRepository.findById(cartItemRequest.getProductId())
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+        System.out.println("Service: Found product: " + product.getName() + " (ID: " + product.getId() + ")");
+
+        // Check if product has enough stock
+        if (product.getQuantity() < cartItemRequest.getQuantity()) {
+            throw new RuntimeException("Insufficient stock. Available: " + product.getQuantity());
+        }
+
+        Optional<CartItem> existingCartItem = Optional.ofNullable(cartItemRepository.findByBuyerAndProduct(buyer, product));
+
+        if (existingCartItem.isPresent()) {
+            System.out.println("Service: Updating existing cart item");
+            CartItem cartItem = existingCartItem.get();
+            int newQuantity = cartItem.getQuantity() + cartItemRequest.getQuantity();
+            
+            // Check if new total quantity exceeds available stock
+            if (product.getQuantity() < newQuantity) {
+                throw new RuntimeException("Insufficient stock. Available: " + product.getQuantity() + ", Requested: " + newQuantity);
+            }
+            
+            cartItem.setQuantity(newQuantity);
+            CartItem savedItem = cartItemRepository.save(cartItem);
+            System.out.println("Service: Updated cart item with ID: " + savedItem.getId());
+        } else {
+            System.out.println("Service: Creating new cart item");
+            CartItem cartItem = new CartItem(buyer, product, cartItemRequest.getQuantity());
+            CartItem savedItem = cartItemRepository.save(cartItem);
+            System.out.println("Service: Created new cart item with ID: " + savedItem.getId());
+            System.out.println("Service: Cart item details - Buyer ID: " + savedItem.getBuyer().getId() + ", Product ID: " + savedItem.getProduct().getId() + ", Quantity: " + savedItem.getQuantity());
+        }
+        
+        // Verify the item was saved by querying again
+        List<CartItem> allItems = cartItemRepository.findByBuyer(buyer);
+        System.out.println("Service: Total cart items for user after save: " + allItems.size());
+        
+        // Force flush to ensure data is written to database
+        cartItemRepository.flush();
+        System.out.println("Service: Flushed changes to database");
+    }
+
+    @Override
+    @Transactional
+    public void updateCartItem(Long userId, CartItemRequest cartItemRequest) {
+        System.out.println("Service: Updating cart item - User ID: " + userId + ", Product ID: " + cartItemRequest.getProductId() + ", Quantity: " + cartItemRequest.getQuantity());
+        
+        User buyer = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        
+        Product product = productRepository.findById(cartItemRequest.getProductId())
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+
+        // Check if product has enough stock
+        if (product.getQuantity() < cartItemRequest.getQuantity()) {
+            throw new RuntimeException("Insufficient stock. Available: " + product.getQuantity());
+        }
+
+        CartItem cartItem = cartItemRepository.findByBuyerAndProduct(buyer, product);
+        if (cartItem == null) {
+            throw new RuntimeException("Cart item not found");
+        }
+
+        cartItem.setQuantity(cartItemRequest.getQuantity());
+        CartItem savedItem = cartItemRepository.save(cartItem);
+        System.out.println("Service: Updated cart item with ID: " + savedItem.getId());
+    }
+
+    @Override
+    @Transactional
+    public void removeFromCart(Long userId, Long productId) {
+        System.out.println("Service: Removing from cart - User ID: " + userId + ", Product ID: " + productId);
+        
+        User buyer = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
-        Optional<CartItem> existingCartItem = cartItemRepository.findByBuyerIdAndProductId(buyerId, productId);
-
-        if (existingCartItem.isPresent()) {
-            CartItem cartItem = existingCartItem.get();
-            cartItem.setQuantity(cartItem.getQuantity() + quantity);
-            cartItemRepository.save(cartItem);
-        } else {
-            CartItem cartItem = new CartItem();
-            cartItem.setProduct(product);
-            cartItem.setQuantity(quantity);
-            cartItem.setBuyer(buyer);
-            cartItemRepository.save(cartItem);
+        CartItem cartItem = cartItemRepository.findByBuyerAndProduct(buyer, product);
+        if (cartItem == null) {
+            throw new RuntimeException("Cart item not found");
         }
+
+        cartItemRepository.delete(cartItem);
+        System.out.println("Service: Removed cart item with ID: " + cartItem.getId());
     }
 
     @Override
-    public void removeFromCart(Long buyerId, Long productId) {
-        cartItemRepository.findByBuyerIdAndProductId(buyerId, productId);
+    @Transactional
+    public void clearCart(Long userId) {
+        System.out.println("Service: Clearing cart for user ID: " + userId);
+        
+        User buyer = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        
+        cartItemRepository.deleteByBuyer(buyer);
+        System.out.println("Service: Cleared all cart items for user");
+    }
+
+    @Override
+    public int getCartItemCount(Long userId) {
+        System.out.println("Service: Getting cart count for user ID: " + userId);
+        
+        User buyer = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        
+        List<CartItem> cartItems = cartItemRepository.findByBuyer(buyer);
+        int count = cartItems.stream().mapToInt(CartItem::getQuantity).sum();
+        System.out.println("Service: Cart count: " + count);
+        return count;
     }
 }
