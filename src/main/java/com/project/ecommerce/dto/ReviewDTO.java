@@ -1,20 +1,31 @@
 package com.project.ecommerce.dto;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
-public class Review {
+public class ReviewDTO {
+    private Long id;
     private String reviewerName;
     private int rating;
     private String comment;
-    private LocalDateTime createdAt;
+    private Timestamp createdAt;
 
-    public Review() {}
+    public ReviewDTO() {}
 
-    public Review(String reviewerName, int rating, String comment, LocalDateTime createdAt) {
-        this.reviewerName = reviewerName;
-        this.rating = rating;
-        this.comment = comment;
+    public ReviewDTO(Timestamp createdAt, String comment, int rating, String reviewerName, Long id) {
         this.createdAt = createdAt;
+        this.comment = comment;
+        this.rating = rating;
+        this.reviewerName = reviewerName;
+        this.id = id;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getReviewerName() {
@@ -41,11 +52,11 @@ public class Review {
         this.comment = comment;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public Timestamp getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
     }
 }
