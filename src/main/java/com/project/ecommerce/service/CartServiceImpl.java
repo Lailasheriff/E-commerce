@@ -103,13 +103,8 @@ public class CartServiceImpl implements CartService {
             System.out.println("Service: Cart item details - Buyer ID: " + savedItem.getBuyer().getId() + ", Product ID: " + savedItem.getProduct().getId() + ", Quantity: " + savedItem.getQuantity());
         }
         
-        // Verify the item was saved by querying again
-        List<CartItem> allItems = cartItemRepository.findByBuyer(buyer);
-        System.out.println("Service: Total cart items for user after save: " + allItems.size());
-        
-        // Force flush to ensure data is written to database
-        cartItemRepository.flush();
-        System.out.println("Service: Flushed changes to database");
+        product.setQuantity(product.getQuantity() - cartItemRequest.getQuantity());
+        productRepository.save(product);
     }
 
     @Override
@@ -155,7 +150,8 @@ public class CartServiceImpl implements CartService {
         }
 
         cartItemRepository.delete(cartItem);
-        System.out.println("Service: Removed cart item with ID: " + cartItem.getId());
+        product.setQuantity(product.getQuantity() + cartItem.getQuantity());
+        productRepository.save(product);
     }
 
     @Override
