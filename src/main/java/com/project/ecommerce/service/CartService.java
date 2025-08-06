@@ -14,8 +14,6 @@ public interface CartService {
 
     void addToCart(Long userId, CartItemRequest cartItemRequest);
 
-    void updateCartItem(Long userId, CartItemRequest cartItemRequest);
-
     void removeFromCart(Long userId, Long productId);
 
     void clearCart(Long userId);

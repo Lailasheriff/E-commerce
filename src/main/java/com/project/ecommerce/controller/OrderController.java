@@ -2,16 +2,16 @@ package com.project.ecommerce.controller;
 
 
 import com.project.ecommerce.dto.CartItemRequest;
+import com.project.ecommerce.dto.OrderResponse;
 import com.project.ecommerce.service.JwtService;
 import com.project.ecommerce.service.OrderService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/buyer")
@@ -38,6 +38,20 @@ public class OrderController {
             return ResponseEntity.ok("Checkout successful!");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error during checkout: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/orders")
+    public ResponseEntity<?> getOrderHistory(HttpServletRequest request) {
+        try {
+            // extract user ID from JWT in request header
+            Long userId = extractUserIdFromRequest(request);
+
+            // get order history for the user
+            List<OrderResponse> orderHistory = orderService.getOrderHistory(userId);
+            return ResponseEntity.ok(orderHistory);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error fetching order history: " + e.getMessage());
         }
     }
 

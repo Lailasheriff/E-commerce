@@ -44,33 +44,26 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public List<CartItemResponse> getCartItemsResponse(Long userId) {
-        List<CartItem> cartItems = getCartItems(userId);
-        return cartItems.stream()
-                .map(this::convertToCartItemResponse)
+        return getCartItems(userId).stream()
+                .map(cartItem -> new CartItemResponse(
+                        cartItem.getId(),
+                        cartItem.getProduct().getId(),
+                        cartItem.getProduct().getName(),
+                        cartItem.getProduct().getPrice(),
+                        cartItem.getQuantity()
+                ))
                 .collect(Collectors.toList());
-    }
-
-    private CartItemResponse convertToCartItemResponse(CartItem cartItem) {
-        // Force loading of the product to avoid lazy loading issues
-        Product product = cartItem.getProduct();
-        return new CartItemResponse(
-                cartItem.getId(),
-                product.getId(),
-                product.getName(),
-                product.getPrice(),
-                cartItem.getQuantity()
-        );
     }
 
     @Override
     @Transactional
     public void addToCart(Long userId, CartItemRequest cartItemRequest) {
         System.out.println("Service: Adding to cart - User ID: " + userId + ", Product ID: " + cartItemRequest.getProductId() + ", Quantity: " + cartItemRequest.getQuantity());
-        
+
         User buyer = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         System.out.println("Service: Found user: " + buyer.getName() + " (ID: " + buyer.getId() + ")");
-        
+
         Product product = productRepository.findById(cartItemRequest.getProductId())
                 .orElseThrow(() -> new RuntimeException("Product not found"));
         System.out.println("Service: Found product: " + product.getName() + " (ID: " + product.getId() + ")");
@@ -86,12 +79,12 @@ public class CartServiceImpl implements CartService {
             System.out.println("Service: Updating existing cart item");
             CartItem cartItem = existingCartItem.get();
             int newQuantity = cartItem.getQuantity() + cartItemRequest.getQuantity();
-            
+
             // Check if new total quantity exceeds available stock
             if (product.getQuantity() < newQuantity) {
                 throw new RuntimeException("Insufficient stock. Available: " + product.getQuantity() + ", Requested: " + newQuantity);
             }
-            
+
             cartItem.setQuantity(newQuantity);
             CartItem savedItem = cartItemRepository.save(cartItem);
             System.out.println("Service: Updated cart item with ID: " + savedItem.getId());
@@ -102,45 +95,19 @@ public class CartServiceImpl implements CartService {
             System.out.println("Service: Created new cart item with ID: " + savedItem.getId());
             System.out.println("Service: Cart item details - Buyer ID: " + savedItem.getBuyer().getId() + ", Product ID: " + savedItem.getProduct().getId() + ", Quantity: " + savedItem.getQuantity());
         }
-        
+
         product.setQuantity(product.getQuantity() - cartItemRequest.getQuantity());
         productRepository.save(product);
     }
 
     @Override
     @Transactional
-    public void updateCartItem(Long userId, CartItemRequest cartItemRequest) {
-        System.out.println("Service: Updating cart item - User ID: " + userId + ", Product ID: " + cartItemRequest.getProductId() + ", Quantity: " + cartItemRequest.getQuantity());
-        
-        User buyer = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        
-        Product product = productRepository.findById(cartItemRequest.getProductId())
-                .orElseThrow(() -> new RuntimeException("Product not found"));
-
-        // Check if product has enough stock
-        if (product.getQuantity() < cartItemRequest.getQuantity()) {
-            throw new RuntimeException("Insufficient stock. Available: " + product.getQuantity());
-        }
-
-        CartItem cartItem = cartItemRepository.findByBuyerAndProduct(buyer, product);
-        if (cartItem == null) {
-            throw new RuntimeException("Cart item not found");
-        }
-
-        cartItem.setQuantity(cartItemRequest.getQuantity());
-        CartItem savedItem = cartItemRepository.save(cartItem);
-        System.out.println("Service: Updated cart item with ID: " + savedItem.getId());
-    }
-
-    @Override
-    @Transactional
     public void removeFromCart(Long userId, Long productId) {
         System.out.println("Service: Removing from cart - User ID: " + userId + ", Product ID: " + productId);
-        
+
         User buyer = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        
+
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
@@ -158,10 +125,10 @@ public class CartServiceImpl implements CartService {
     @Transactional
     public void clearCart(Long userId) {
         System.out.println("Service: Clearing cart for user ID: " + userId);
-        
+
         User buyer = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        
+
         cartItemRepository.deleteByBuyer(buyer);
         System.out.println("Service: Cleared all cart items for user");
     }
@@ -169,10 +136,10 @@ public class CartServiceImpl implements CartService {
     @Override
     public int getCartItemCount(Long userId) {
         System.out.println("Service: Getting cart count for user ID: " + userId);
-        
+
         User buyer = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        
+
         List<CartItem> cartItems = cartItemRepository.findByBuyer(buyer);
         int count = cartItems.stream().mapToInt(CartItem::getQuantity).sum();
         System.out.println("Service: Cart count: " + count);

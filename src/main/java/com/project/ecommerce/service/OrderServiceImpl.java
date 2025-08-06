@@ -1,5 +1,7 @@
 package com.project.ecommerce.service;
 
+import com.project.ecommerce.dto.OrderItemResponse;
+import com.project.ecommerce.dto.OrderResponse;
 import com.project.ecommerce.entity.*;
 import com.project.ecommerce.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -20,9 +23,7 @@ public class OrderServiceImpl implements OrderService {
     private CartItemRepository cartItemRepository;
 
     @Autowired
-    public OrderServiceImpl(OrderRepository orderRepository, UserRepository userRepository
-    , ProductRepository productRepository, OrderItemRepository orderItemRepository
-    , CartItemRepository cartItemRepository) {
+    public OrderServiceImpl(OrderRepository orderRepository, UserRepository userRepository, ProductRepository productRepository, OrderItemRepository orderItemRepository, CartItemRepository cartItemRepository) {
         this.orderRepository = orderRepository;
         this.userRepository = userRepository;
         this.productRepository = productRepository;
@@ -34,8 +35,7 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public void checkout(Long buyerId) {
 
-        User buyer = userRepository.findById(buyerId)
-                .orElseThrow( () -> new RuntimeException("Buyer not found"));
+        User buyer = userRepository.findById(buyerId).orElseThrow(() -> new RuntimeException("Buyer not found"));
 
         List<CartItem> cartItems = cartItemRepository.findByBuyerId(buyerId);
         if (cartItems.isEmpty()) {
@@ -66,7 +66,29 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<Order> getOrderHistory(Long buyerId) {
-        return orderRepository.findByBuyerId(buyerId);
+    public List<OrderResponse> getOrderHistory(Long buyerId) {
+        List<Order> orders = orderRepository.findByBuyerId(buyerId);
+        List<OrderResponse> orderResponses = new ArrayList<>();
+        for (Order order : orders) {
+            List<OrderItem> orderItems = orderItemRepository.findByOrder(order);
+            List<OrderItemResponse> itemResponses = new ArrayList<>();
+            for (OrderItem item : orderItems) {
+                OrderItemResponse itemResponse = new OrderItemResponse(
+                        item.getProduct().getName(),
+                        item.getQuantity(),
+                        item.getPrice().doubleValue()
+                );
+                itemResponses.add(itemResponse);
+            }
+            OrderResponse orderResponse = new OrderResponse(
+                    order.getId(),
+                    order.getStatus().name(),
+                    order.getTotal().doubleValue(),
+                    order.getCreatedAt(),
+                    itemResponses
+            );
+            orderResponses.add(orderResponse);
+        }
+        return orderResponses;
     }
 }

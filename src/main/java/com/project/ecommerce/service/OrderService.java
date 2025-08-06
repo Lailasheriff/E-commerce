@@ -1,5 +1,6 @@
 package com.project.ecommerce.service;
 
+import com.project.ecommerce.dto.OrderResponse;
 import com.project.ecommerce.entity.Order;
 
 
@@ -9,5 +10,5 @@ public interface OrderService {
 
     void checkout(Long buyerId);
 
-    List<Order> getOrderHistory(Long buyerId);
+    List<OrderResponse> getOrderHistory(Long buyerId);
 }
