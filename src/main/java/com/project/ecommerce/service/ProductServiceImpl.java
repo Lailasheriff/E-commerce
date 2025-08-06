@@ -8,6 +8,7 @@ import com.project.ecommerce.entity.Review;
 import com.project.ecommerce.exception.ResourceNotFoundException;
 import com.project.ecommerce.repository.ProductRepository;
 import com.project.ecommerce.repository.ReviewRepository;
+import com.project.ecommerce.util.GenericSearchUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,11 +21,13 @@ import java.util.stream.Collectors;
 public class ProductServiceImpl implements ProductService{
     private final ProductRepository productRepository;
     private final ReviewRepository reviewRepository;
+    private final GenericSearchUtil genericSearchUtil;
 
     @Autowired
-    public ProductServiceImpl(ProductRepository productRepository, ReviewRepository reviewRepository) {
+    public ProductServiceImpl(ProductRepository productRepository, ReviewRepository reviewRepository, GenericSearchUtil genericSearchUtil) {
         this.productRepository = productRepository;
         this.reviewRepository = reviewRepository;
+        this.genericSearchUtil = genericSearchUtil;
     }
 
     @Override
@@ -39,6 +42,19 @@ public class ProductServiceImpl implements ProductService{
 
         List<Review> reviews = reviewRepository.findByProductId(productId);
         return toProductDetailsDTO(product, reviews);
+    }
+
+    @Override
+    public List<ProductDetailsDTO> searchProducts(String query) {
+        List<Product> allProducts = productRepository.findAll();
+        List<Product> matchedProducts=genericSearchUtil.search(allProducts, query, "name", "description", "price","quantity");
+
+        return matchedProducts.stream()
+                .map(product -> {
+                    List<Review> reviews = reviewRepository.findByProductId(product.getId());
+                    return toProductDetailsDTO(product, reviews);
+                })
+                .collect(Collectors.toList());
     }
 
     private ProductDetailsDTO toProductDetailsDTO(Product product, List<Review> reviews) {
