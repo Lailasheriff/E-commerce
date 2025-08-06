@@ -12,12 +12,11 @@ public class ProductDetails {
     private double averageRating;
     private int totalReviews;
     private List<Review> reviews;
+    private String imageUrl;
 
     public ProductDetails() {}
 
-    public ProductDetails(Long id, String name, String description, BigDecimal price,
-                            int quantityAvailable, double averageRating, int totalReviews,
-                            List<Review> reviews) {
+    public ProductDetails(Long id, String name, String description, BigDecimal price, int quantityAvailable, double averageRating, int totalReviews, List<Review> reviews, String imageUrl) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -26,6 +25,15 @@ public class ProductDetails {
         this.averageRating = averageRating;
         this.totalReviews = totalReviews;
         this.reviews = reviews;
+        this.imageUrl = imageUrl;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
     public Long getId() {
