@@ -37,6 +37,7 @@ public class JwtService {
     public String extractEmail(String token) {
         return extractClaim(token, Claims::getSubject);
     }
+
     public Long extractId(String token) {
         String subject = extractClaim(token, Claims::getSubject); // "sub" is stored as String
         return Long.parseLong(subject); // Convert to Long
@@ -46,9 +47,6 @@ public class JwtService {
         String roleStr = extractClaim(token, claims -> claims.get("role", String.class));
         return Role.valueOf(roleStr); // Convert string back to enum
     }
-
-
-
 
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
@@ -64,14 +62,12 @@ public class JwtService {
     }
 
     public boolean isTokenValid(String token) {
-        final String extractedEmail = extractEmail(token);
         final Role extractedRole= extractRole(token);
         final Long extractedId= extractId(token);
         boolean expired = isTokenExpired(token);
 
 
 
-        System.out.println("Extracted Email: " + extractedEmail);
         System.out.println("Extracted Role: " + extractedRole);
         System.out.println("Extracted Id: " + extractedId);
 

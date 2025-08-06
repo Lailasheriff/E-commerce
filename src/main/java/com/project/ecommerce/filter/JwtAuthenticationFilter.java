@@ -1,6 +1,6 @@
 package com.project.ecommerce.filter;
 
-import com.project.ecommerce.dto.UserDetails;
+import com.project.ecommerce.entity.Role;
 import com.project.ecommerce.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -8,15 +8,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -51,24 +47,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 throw new RuntimeException("Invalid JWT token");
             }
 
-            //Integer userId = jwtService.extractUserId(token);
-            //String role = jwtService.extractUserRole(token);
-            String email = jwtService.extractEmail(token);
-            UserDetails userDetails = new UserDetails(0, email);
+            Long userId = jwtService.extractId(token);
+            Role role = jwtService.extractRole(token);
 
-            // - Build UserDetails
-            //UserDetails userDetails = new UserDetails(userId, role);
+            if(path.startsWith("/seller") && role != Role.SELLER) {
+                throw new RuntimeException("Access denied for non-seller users");
+            }
 
-            // - Set SecurityContext
-            //List<SimpleGrantedAuthority> authorities =
-                    //Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role));
+            if(path.startsWith("/buyer") && role != Role.BUYER) {
+                throw new RuntimeException("Access denied for non-buyer users");
+            }
 
             UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(userDetails, null);
+                    new UsernamePasswordAuthenticationToken(userId, null);
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            // 7. Continue filter chain
             filterChain.doFilter(request, response);
 
         } catch (Exception e) {
