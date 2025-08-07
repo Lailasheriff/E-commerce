@@ -2,6 +2,7 @@ package com.project.ecommerce.service;
 
 
 import com.project.ecommerce.entity.Role;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Service;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
@@ -86,5 +87,25 @@ public class JwtService {
 
     private Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
+    }
+
+    public Long extractUserIdFromRequest(HttpServletRequest request) {
+
+        String authHeader = request.getHeader("Authorization");
+
+        // Validate the Authorization header
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            throw new RuntimeException("Missing or invalid Authorization header");
+        }
+
+        // Extract the token from the header and remove "Bearer " prefix
+        String token = authHeader.substring(7);
+
+        // Validate the JWT token
+        if (isTokenValid(token)) {
+            throw new RuntimeException("Invalid JWT token");
+        }
+
+        return extractId(token);
     }
 }
