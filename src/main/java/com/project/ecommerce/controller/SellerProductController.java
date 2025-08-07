@@ -57,4 +57,24 @@ public class SellerProductController {
         }
     }
 
+    @GetMapping("/search-products")
+    public ResponseEntity<?> searchProducts(@RequestParam String query) {
+        Long sellerId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        try {
+            return ResponseEntity.ok(sellerProductService.searchProductsBySeller(sellerId, query));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error searching products: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/filter-products")
+    public ResponseEntity<?> filterProducts(@RequestParam String sortBy, @RequestParam String order) {
+        Long sellerId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        try {
+            return ResponseEntity.ok(sellerProductService.filterProductsBySeller(sellerId, sortBy, order));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error filtering products: " + e.getMessage());
+        }
+    }
+
 }
