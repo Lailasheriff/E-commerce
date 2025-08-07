@@ -31,7 +31,7 @@ public class ReviewController {
 
         try {
             // Extract user ID from JWT in request header
-            Long buyerId = extractUserIdFromRequest(request);
+            Long buyerId = jwtService.extractUserIdFromRequest(request);
 
             // Submit the review
             reviewService.submitReview(buyerId, reviewRequest);
@@ -40,25 +40,5 @@ public class ReviewController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error submitting review: " + e.getMessage());
         }
-    }
-
-    private Long extractUserIdFromRequest(HttpServletRequest request) {
-
-        String authHeader = request.getHeader("Authorization");
-
-        // Validate the Authorization header
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            throw new RuntimeException("Missing or invalid Authorization header");
-        }
-
-        // Extract the token from the header and remove "Bearer " prefix
-        String token = authHeader.substring(7);
-
-        // Validate the JWT token
-        if (!jwtService.isTokenValid(token)) {
-            throw new RuntimeException("Invalid JWT token");
-        }
-
-        return jwtService.extractId(token);
     }
 }

@@ -30,7 +30,7 @@ public class OrderController {
     public ResponseEntity<?> checkout(HttpServletRequest request) {
         try {
             // extract user ID from JWT in request header
-            Long userId = extractUserIdFromRequest(request);
+            Long userId = jwtService.extractUserIdFromRequest(request);
 
             // process the checkout
             orderService.checkout(userId);
@@ -45,7 +45,7 @@ public class OrderController {
     public ResponseEntity<?> getOrderHistory(HttpServletRequest request) {
         try {
             // extract user ID from JWT in request header
-            Long userId = extractUserIdFromRequest(request);
+            Long userId = jwtService.extractUserIdFromRequest(request);
 
             // get order history for the user
             List<OrderResponse> orderHistory = orderService.getOrderHistory(userId);
@@ -53,25 +53,5 @@ public class OrderController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error fetching order history: " + e.getMessage());
         }
-    }
-
-    private Long extractUserIdFromRequest(HttpServletRequest request) {
-
-        String authHeader = request.getHeader("Authorization");
-
-        // Validate the Authorization header
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            throw new RuntimeException("Missing or invalid Authorization header");
-        }
-
-        // Extract the token from the header and remove "Bearer " prefix
-        String token = authHeader.substring(7);
-
-        // Validate the JWT token
-        if (!jwtService.isTokenValid(token)) {
-            throw new RuntimeException("Invalid JWT token");
-        }
-
-        return jwtService.extractId(token);
     }
 }
