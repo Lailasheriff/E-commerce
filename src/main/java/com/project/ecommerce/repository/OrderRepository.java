@@ -2,6 +2,7 @@ package com.project.ecommerce.repository;
 
 import com.project.ecommerce.entity.Order;
 import com.project.ecommerce.entity.OrderStatus;
+import com.project.ecommerce.entity.Product;
 import com.project.ecommerce.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -16,4 +17,8 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     List<Order> findByBuyerId(Long buyerId);
 
     List<Order> findByBuyerAndStatus(User buyer, OrderStatus status);
+
+    boolean existsByBuyerAndStatusAndItemsProduct(User buyer,
+                                                       OrderStatus status,
+                                                       Product product);
 }
