@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 public class SellerProductController {
     @Autowired
     SellerProductService sellerProductService;
-    // method for adding products
+
     @PostMapping("/add-product")
     public ResponseEntity<String> addProduct(@RequestBody ProductRequest productRequest) {
         // need to add validation here for product details
@@ -56,6 +56,5 @@ public class SellerProductController {
             return ResponseEntity.badRequest().body("Error fetching products: " + e.getMessage());
         }
     }
-
 
 }
