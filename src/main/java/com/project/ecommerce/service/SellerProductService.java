@@ -1,7 +1,7 @@
 package com.project.ecommerce.service;
 
 import com.project.ecommerce.dto.ProductRequest;
-import com.project.ecommerce.dto.ProductSummary;
+import com.project.ecommerce.dto.ProductSummaryDTO;
 import com.project.ecommerce.entity.Product;
 import com.project.ecommerce.entity.User;
 import com.project.ecommerce.repository.ProductRepository;
@@ -70,16 +70,16 @@ public class SellerProductService {
     }
 
     // Method to get all products for a seller
-    public List<ProductSummary> getProductsBySeller(Long sellerId) {
+    public List<ProductSummaryDTO> getProductsBySeller(Long sellerId) {
         User seller = userRepository.findById(sellerId)
                 .orElseThrow(() -> new RuntimeException("Seller not found with id: " + sellerId));
         List<Product> products = productRepository.findAllBySellerId(sellerId);
         return products.stream()
-                .map(product -> new ProductSummary(
+                .map(product -> new ProductSummaryDTO(
                         product.getId(),
                         product.getName(),
                         product.getPrice(),
-                        3.5)) // Placeholder for average rating, can be replaced with actual logic))
+                        product.getImageUrl()))
                 .toList();
     }
 }
