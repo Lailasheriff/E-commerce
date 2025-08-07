@@ -3,7 +3,7 @@ package com.project.ecommerce.dto;
 import java.math.BigDecimal;
 import java.util.List;
 
-public class ProductDetails {
+public class ProductDetailsDTO {
     private Long id;
     private String name;
     private String description;
@@ -11,12 +11,20 @@ public class ProductDetails {
     private int quantityAvailable;
     private double averageRating;
     private int totalReviews;
-    private List<Review> reviews;
+    private List<ReviewDTO> reviewDTOS;
     private String imageUrl;
 
-    public ProductDetails() {}
+    public ProductDetailsDTO() {}
 
-    public ProductDetails(Long id, String name, String description, BigDecimal price, int quantityAvailable, double averageRating, int totalReviews, List<Review> reviews, String imageUrl) {
+    public ProductDetailsDTO(Long id, String name, BigDecimal price, double averageRating, int quantityAvailable) {
+        this.id = id;
+        this.name = name;
+        this.price = price;
+        this.averageRating = averageRating;
+        this.quantityAvailable = quantityAvailable;
+    }
+
+    public ProductDetailsDTO(Long id, String name, String description, BigDecimal price, int quantityAvailable, double averageRating, int totalReviews, List<ReviewDTO> reviewDTOS, String imageUrl) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -24,7 +32,7 @@ public class ProductDetails {
         this.quantityAvailable = quantityAvailable;
         this.averageRating = averageRating;
         this.totalReviews = totalReviews;
-        this.reviews = reviews;
+        this.reviewDTOS = reviewDTOS;
         this.imageUrl = imageUrl;
     }
 
@@ -92,11 +100,11 @@ public class ProductDetails {
         this.totalReviews = totalReviews;
     }
 
-    public List<Review> getReviews() {
-        return reviews;
+    public List<ReviewDTO> getReviews() {
+        return reviewDTOS;
     }
 
-    public void setReviews(List<Review> reviews) {
-        this.reviews = reviews;
+    public void setReviews(List<ReviewDTO> reviewDTOS) {
+        this.reviewDTOS = reviewDTOS;
     }
 }
