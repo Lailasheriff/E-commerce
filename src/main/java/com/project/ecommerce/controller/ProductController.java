@@ -27,14 +27,14 @@ public class ProductController {
 
 
     @GetMapping("/products")
-    public Page<ProductSummaryDTO> getAllProducts(@PageableDefault(size = 10, sort = "name") Pageable pageable)
+    public Page<ProductSummaryDTO> getAllProducts(@PageableDefault(size = 10) Pageable pageable)
     {
         return productService.getAllProductSummaries(pageable);
     }
 
     @GetMapping("/products/filter")
     public ResponseEntity<List<ProductDetailsDTO>> getAllProductDetailsSorted(
-            @RequestParam(defaultValue = "name") String sortBy,
+            @RequestParam String sortBy,
             @RequestParam(defaultValue = "asc") String order
     ) {
         List<ProductDetailsDTO> products = productService.getAllProductDetailsSorted(sortBy, order);
