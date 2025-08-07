@@ -72,11 +72,13 @@ public class OrderServiceImpl implements OrderService {
         for (Order order : orders) {
             List<OrderItem> orderItems = orderItemRepository.findByOrder(order);
             List<OrderItemResponse> itemResponses = new ArrayList<>();
+
             for (OrderItem item : orderItems) {
                 OrderItemResponse itemResponse = new OrderItemResponse(
                         item.getProduct().getName(),
                         item.getQuantity(),
-                        item.getPrice().doubleValue()
+                        item.getProduct().getPrice(),
+                        item.getProduct().getId()
                 );
                 itemResponses.add(itemResponse);
             }
