@@ -2,20 +2,20 @@ package com.project.ecommerce.dto;
 
 import java.math.BigDecimal;
 
-public class ProductSummary {
+public class ProductSummaryDTO {
 
         private Long id;
         private String name;
         private BigDecimal price;
-        private double averageRating;
+        private String imageUrl;
 
-    public ProductSummary() {}
+    public ProductSummaryDTO() {}
 
-    public ProductSummary(Long id, String name, BigDecimal price, double averageRating) {
+    public ProductSummaryDTO(Long id, String name, BigDecimal price, String imageUrl) {
         this.id = id;
         this.name = name;
         this.price = price;
-        this.averageRating = averageRating;
+        this.imageUrl = imageUrl;
     }
 
     public Long getId() {
@@ -42,11 +42,12 @@ public class ProductSummary {
         this.price = price;
     }
 
-    public double getAverageRating() {
-        return averageRating;
+
+    public String getImageUrl() {
+        return imageUrl;
     }
 
-    public void setAverageRating(double averageRating) {
-        this.averageRating = averageRating;
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 }
