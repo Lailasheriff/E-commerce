@@ -48,6 +48,11 @@ public class ProductServiceImpl implements ProductService{
 
     @Override
     public List<ProductDetailsDTO> searchProducts(String query) {
+
+        if (query == null || query.trim().isEmpty()) {
+            throw new IllegalArgumentException("Search query cannot be empty");
+        }
+
         List<Product> allProducts = productRepository.findAll();
         List<Product> matchedProducts=genericSearchUtil.search(allProducts, query, "name", "description", "price","quantity");
 
@@ -61,9 +66,12 @@ public class ProductServiceImpl implements ProductService{
 
     @Override
     public List<ProductDetailsDTO> getAllProductDetailsSorted(String sortBy, String direction) {
+
+        if (sortBy == null || sortBy.trim().isEmpty()) {
+            throw new IllegalArgumentException("Sort parameter cannot be empty");
+        }
+
         List<Product> products = productRepository.findAll();
-
-
         List<ProductDetailsDTO> detailedProducts = products.stream()
                 .map(product -> getProductDetailsWithReviews(product.getId()))
                 .collect(Collectors.toList());
@@ -76,6 +84,9 @@ public class ProductServiceImpl implements ProductService{
                 comparator = comparator.reversed();
             }
             detailedProducts.sort(comparator);
+        }
+        else {
+            throw new IllegalArgumentException("Invalid sort field. use (id,name,price,quantity,or averageRating)");
         }
 
         return detailedProducts;

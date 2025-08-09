@@ -3,7 +3,10 @@ package com.project.ecommerce.controller;
 import com.project.ecommerce.dto.ProductDetailsDTO;
 import com.project.ecommerce.dto.ProductSummaryDTO;
 import com.project.ecommerce.entity.Product;
+import com.project.ecommerce.exception.MissingFilterParameterException;
+import com.project.ecommerce.exception.MissingSearchParameterException;
 import com.project.ecommerce.service.ProductService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,16 +30,19 @@ public class ProductController {
 
 
     @GetMapping("/products")
-    public Page<ProductSummaryDTO> getAllProducts(@PageableDefault(size = 10, sort = "name") Pageable pageable)
+    public Page<ProductSummaryDTO> getAllProducts(@PageableDefault(size = 10) Pageable pageable)
     {
         return productService.getAllProductSummaries(pageable);
     }
 
     @GetMapping("/products/filter")
     public ResponseEntity<List<ProductDetailsDTO>> getAllProductDetailsSorted(
-            @RequestParam(defaultValue = "name") String sortBy,
-            @RequestParam(defaultValue = "asc") String order
+            @RequestParam(name="sortBy",required = false) String sortBy,
+            @RequestParam(defaultValue = "asc") String order,HttpServletRequest request
     ) {
+        if (!request.getParameterMap().containsKey("sortBy")) {
+            throw new MissingFilterParameterException("Missing required parameter: SortBy");
+        }
         List<ProductDetailsDTO> products = productService.getAllProductDetailsSorted(sortBy, order);
         return ResponseEntity.ok(products);
     }
@@ -52,7 +58,12 @@ public class ProductController {
     }
 
     @GetMapping("/products/search")
-    public ResponseEntity<List<ProductDetailsDTO>> searchProducts(@RequestParam String query) {
+    public ResponseEntity<List<ProductDetailsDTO>> searchProducts(@RequestParam(name = "query", required = false) String query,
+                                                                  HttpServletRequest request
+    ) {
+        if (!request.getParameterMap().containsKey("query")) {
+            throw new MissingSearchParameterException("Missing required parameter: query");
+        }
         List<ProductDetailsDTO> results = productService.searchProducts(query);
         return ResponseEntity.ok(results);
     }

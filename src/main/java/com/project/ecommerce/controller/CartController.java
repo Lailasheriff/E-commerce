@@ -30,7 +30,7 @@ public class CartController {
     public ResponseEntity<?> getCartItems(HttpServletRequest request) {
         try {
             // extract user ID from JWT in request header
-            Long userId = extractUserIdFromRequest(request);
+            Long userId = jwtService.extractUserIdFromRequest(request);
 
             // get cart items for the user
             List<CartItemResponse> cartItems = cartService.getCartItemsResponse(userId);
@@ -45,7 +45,7 @@ public class CartController {
     public ResponseEntity<?> addToCart(@Valid @RequestBody CartItemRequest cartItemRequest, HttpServletRequest request) {
         try {
             // extract user ID from JWT in request header
-            Long userId = extractUserIdFromRequest(request);
+            Long userId = jwtService.extractUserIdFromRequest(request);
 
             // add item to cart
             cartService.addToCart(userId, cartItemRequest);
@@ -60,7 +60,7 @@ public class CartController {
     public ResponseEntity<?> removeFromCart(@PathVariable Long productId, HttpServletRequest request) {
         try {
             // extract user ID from JWT in request header
-            Long userId = extractUserIdFromRequest(request);
+            Long userId = jwtService.extractUserIdFromRequest(request);
 
             // remove cart item for user
             cartService.removeFromCart(userId, productId);
@@ -74,7 +74,7 @@ public class CartController {
     public ResponseEntity<?> clearCart(HttpServletRequest request) {
         try {
             // extract user ID from JWT in request header
-            Long userId = extractUserIdFromRequest(request);
+            Long userId = jwtService.extractUserIdFromRequest(request);
 
             // clear all cart items for the user
             cartService.clearCart(userId);
@@ -82,24 +82,5 @@ public class CartController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error clearing cart: " + e.getMessage());
         }
-    }
-
-    private Long extractUserIdFromRequest(HttpServletRequest request) {
-        String authHeader = request.getHeader("Authorization");
-
-        // Validate the Authorization header
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            throw new RuntimeException("Missing or invalid Authorization header");
-        }
-
-        // Extract the token from the header and remove "Bearer " prefix
-        String token = authHeader.substring(7);
-
-        // Validate the JWT token
-        if (!jwtService.isTokenValid(token)) {
-            throw new RuntimeException("Invalid JWT token");
-        }
-
-        return jwtService.extractId(token);
     }
 }

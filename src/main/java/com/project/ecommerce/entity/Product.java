@@ -144,18 +144,4 @@ public class Product {
                 ", reviews=" + reviews +
                 '}';
     }
-
-    public double getAverageRating() {
-        if (reviews == null || reviews.isEmpty()) return 0.0;
-        double sum = 0;
-        for (Review r : reviews) {
-            sum += r.getRating();
-        }
-        return sum / reviews.size();
-    }
-
-    public int getTotalReviews() {
-        return reviews != null ? reviews.size() : 0;
-    }
-
 }

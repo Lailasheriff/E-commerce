@@ -22,18 +22,19 @@ import java.util.Optional;
 @RequestMapping("/auth")
 public class AuthController {
 
-    @Autowired
     private UserRepository userRepository;
-
-    @Autowired
     private PasswordEncoder passwordEncoder;
+    private JwtService jwtService;
 
     @Autowired
-    private JwtService jwtService;
+    public AuthController(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
+    }
 
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@Valid @RequestBody SignupRequest signupRequest) {
-        System.out.println("Hi from signup");
         try {
             // get fields from request body
             String name = signupRequest.getName();
