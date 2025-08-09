@@ -7,6 +7,7 @@ import com.project.ecommerce.entity.Product;
 import com.project.ecommerce.entity.User;
 import com.project.ecommerce.exception.CartItemNotFoundException;
 import com.project.ecommerce.exception.ProductNotFoundException;
+import com.project.ecommerce.exception.ResourceNotFoundException;
 import com.project.ecommerce.repository.CartItemRepository;
 import com.project.ecommerce.repository.ProductRepository;
 import com.project.ecommerce.repository.UserRepository;
@@ -37,7 +38,7 @@ public class CartServiceImpl implements CartService {
     public List<CartItem> getCartItems(Long userId) {
 
         User buyer = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
 
         return cartItemRepository.findByBuyer(buyer);
     }
@@ -60,7 +61,7 @@ public class CartServiceImpl implements CartService {
     public void addToCart(Long userId, CartItemRequest cartItemRequest) {
 
         User buyer = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
 
         Product product = productRepository.findById(cartItemRequest.getProductId())
                 .orElseThrow(() -> new ProductNotFoundException("Product not found with ID: " + cartItemRequest.getProductId()));
@@ -77,8 +78,8 @@ public class CartServiceImpl implements CartService {
             int newQuantity = cartItem.getQuantity() + cartItemRequest.getQuantity();
 
             // Check if new total quantity exceeds available stock
-            if (product.getQuantity() < newQuantity) {
-                throw new IllegalArgumentException("Insufficient stock. Available: " + product.getQuantity() + ", Requested: " + newQuantity);
+            if (product.getQuantity() < cartItemRequest.getQuantity()) {
+                throw new IllegalArgumentException("Insufficient stock. Available: " + product.getQuantity() + ", Requested: " + cartItemRequest.getQuantity());
             }
 
             cartItem.setQuantity(newQuantity);
@@ -97,7 +98,7 @@ public class CartServiceImpl implements CartService {
     public void removeFromCart(Long userId, Long productId) {
 
         User buyer = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
 
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ProductNotFoundException("Product not found"));
@@ -115,7 +116,7 @@ public class CartServiceImpl implements CartService {
     public void clearCart(Long userId) {
 
         User buyer = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
 
         cartItemRepository.deleteByBuyer(buyer);
     }

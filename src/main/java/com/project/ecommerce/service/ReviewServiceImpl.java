@@ -5,6 +5,9 @@ import com.project.ecommerce.entity.OrderStatus;
 import com.project.ecommerce.entity.Product;
 import com.project.ecommerce.entity.Review;
 import com.project.ecommerce.entity.User;
+import com.project.ecommerce.exception.ProductNotFoundException;
+import com.project.ecommerce.exception.ResourceNotFoundException;
+import com.project.ecommerce.exception.ReviewNotAllowedException;
 import com.project.ecommerce.repository.OrderRepository;
 import com.project.ecommerce.repository.ProductRepository;
 import com.project.ecommerce.repository.ReviewRepository;
@@ -34,19 +37,19 @@ public class ReviewServiceImpl implements ReviewService {
     public void submitReview(Long buyerId, ReviewRequest reviewRequest) {
 
         Product product = productRepository.findById(reviewRequest.getProductId())
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+                .orElseThrow(() -> new ProductNotFoundException("Product not found"));
 
         User buyer = userRepository.findById(buyerId)
-                .orElseThrow(() -> new RuntimeException("Buyer not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Buyer not found with id: " + buyerId));
 
         boolean delivered = orderRepository.existsByBuyerAndStatusAndItemsProduct(buyer, OrderStatus.DELIVERED, product);
 
         if (!delivered) {
-            throw new RuntimeException("Buyer has not purchased this product or it has not been delivered yet");
+            throw new ReviewNotAllowedException("Buyer has not purchased this product or it has not been delivered yet");
         }
 
         if (reviewRepository.existsByUserAndProduct(buyer, product)) {
-            throw new RuntimeException("Buyer has already submitted a review for this product");
+            throw new ReviewNotAllowedException("Buyer has already submitted a review for this product");
         }
 
         // Create and save the review

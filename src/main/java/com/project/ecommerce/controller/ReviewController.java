@@ -1,7 +1,6 @@
 package com.project.ecommerce.controller;
 
 import com.project.ecommerce.dto.ReviewRequest;
-import com.project.ecommerce.entity.Review;
 import com.project.ecommerce.service.JwtService;
 import com.project.ecommerce.service.ReviewService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,16 +28,12 @@ public class ReviewController {
     @PostMapping("/reviews")
     public ResponseEntity<?> createReview(@Valid @RequestBody ReviewRequest reviewRequest, HttpServletRequest request) {
 
-        try {
-            // Extract user ID from JWT in request header
-            Long buyerId = jwtService.extractUserIdFromRequest(request);
+        // Extract user ID from JWT in request header
+        Long buyerId = jwtService.extractUserIdFromRequest(request);
 
-            // Submit the review
-            reviewService.submitReview(buyerId, reviewRequest);
+        // Submit the review
+        reviewService.submitReview(buyerId, reviewRequest);
 
-            return ResponseEntity.ok("Review submitted successfully!");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error submitting review: " + e.getMessage());
-        }
+        return ResponseEntity.ok("Review submitted successfully!");
     }
 }

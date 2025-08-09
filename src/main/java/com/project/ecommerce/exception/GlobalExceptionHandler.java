@@ -68,4 +68,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponseDTO> handleCartEmpty(CartEmptyException ex) {
         return buildErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(ReviewNotAllowedException.class)
+    public ResponseEntity<ErrorResponseDTO> handleReviewNotAllowed(ReviewNotAllowedException ex) {
+        return buildErrorResponse(ex.getMessage(), HttpStatus.FORBIDDEN);
+    }
 }
