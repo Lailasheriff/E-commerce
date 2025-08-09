@@ -87,7 +87,8 @@ public class OrderServiceImpl implements OrderService {
                     order.getStatus().name(),
                     order.getTotal().doubleValue(),
                     order.getCreatedAt(),
-                    itemResponses
+                    itemResponses,
+                    order.getBuyer().getName()
             );
             orderResponses.add(orderResponse);
         }

@@ -8,8 +8,10 @@ import com.project.ecommerce.repository.OrderRepository;
 import com.project.ecommerce.repository.ProductRepository;
 import com.project.ecommerce.repository.ReviewRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -75,6 +77,7 @@ public class SellerOrderServiceImpl implements SellerOrderService {
             response.setOrderId(order.getId());
             response.setOrderDate(order.getCreatedAt());
             response.setOrderStatus(order.getStatus());
+            response.setBuyerName(order.getBuyer().getName());
 
             List<OrderItemResponse> itemResponses = new ArrayList<>();
             order.getItems().forEach(item -> {
@@ -95,15 +98,16 @@ public class SellerOrderServiceImpl implements SellerOrderService {
 
 
 
-
     @Override
     public String updateOrderStatus(Long orderId, String status) {
         Optional<Order> optionalOrder = orderRepository.findById(orderId);
+
         if (!optionalOrder.isPresent()) {
             throw new RuntimeException("Order not found");
         }
 
         Order order = optionalOrder.get();
+
         try {
             OrderStatus newStatus = OrderStatus.valueOf(status.toUpperCase());
             order.setStatus(newStatus);
@@ -115,6 +119,7 @@ public class SellerOrderServiceImpl implements SellerOrderService {
             throw new RuntimeException("Invalid order status: " + status);
         }
     }
+
 
 
     @Override
@@ -135,6 +140,15 @@ public class SellerOrderServiceImpl implements SellerOrderService {
             list.add(dto);
         }
 
+        if ("asc".equalsIgnoreCase(sortBy)) {
+            list.sort(Comparator.comparingInt(ProductDetailsDTO::getQuantitySold));
+        }
+
+        else {
+            list.sort(Comparator.comparingInt(ProductDetailsDTO::getQuantitySold).reversed());
+        }
+
         return list;
     }
+
 }
