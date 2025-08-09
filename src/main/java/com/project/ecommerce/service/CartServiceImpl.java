@@ -100,7 +100,7 @@ public class CartServiceImpl implements CartService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+                .orElseThrow(() -> new ProductNotFoundException("Product not found"));
 
         CartItem cartItem = cartItemRepository.findByBuyerIdAndProductId(userId, productId)
                 .orElseThrow(() -> new CartItemNotFoundException("CartItem not found for product ID: "+productId));
