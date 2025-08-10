@@ -9,6 +9,9 @@ import com.project.ecommerce.repository.ProductRepository;
 import com.project.ecommerce.repository.ReviewRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -16,6 +19,7 @@ import java.util.List;
 
 
 @Service
+@Transactional
 public class SellerOrderServiceImpl implements SellerOrderService {
 
     @Autowired
@@ -99,7 +103,6 @@ public class SellerOrderServiceImpl implements SellerOrderService {
     }
 
 
-
     @Override
     public String updateOrderStatus(Long orderId, String status) {
 
@@ -112,13 +115,10 @@ public class SellerOrderServiceImpl implements SellerOrderService {
             orderRepository.save(order);
 
             return "Order status updated to " + newStatus;
-        }
-
-        catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             throw new InvalidOrderStatusException("Invalid Order Status");
         }
     }
-
 
 
     @Override
@@ -129,7 +129,7 @@ public class SellerOrderServiceImpl implements SellerOrderService {
         for (Object[] row : stats) {
             Long productId = (Long) row[0];
             String name = (String) row[1];
-            Long quantitySold = (Long) row[2];
+            BigDecimal quantitySold = (BigDecimal) row[2];
 
             SellerProductDetailsDTO dto = new SellerProductDetailsDTO();
             dto.setId(productId);
@@ -149,5 +149,4 @@ public class SellerOrderServiceImpl implements SellerOrderService {
 
         return list;
     }
-
 }

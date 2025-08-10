@@ -1,6 +1,7 @@
 package com.project.ecommerce.controller;
 import com.project.ecommerce.dto.OrderDTO;
 import com.project.ecommerce.dto.SellerProductDetailsDTO;
+import com.project.ecommerce.repository.UserRepository;
 import com.project.ecommerce.service.SellerOrderService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,9 +12,11 @@ import java.util.List;
 public class SellerOrderController {
 
     private final SellerOrderService sellerOrderService;
+    private final UserRepository userRepository;
 
-    public SellerOrderController(SellerOrderService sellerOrderService) {
+    public SellerOrderController(SellerOrderService sellerOrderService, UserRepository userRepository) {
         this.sellerOrderService = sellerOrderService;
+        this.userRepository = userRepository;
     }
 
     // view product details
@@ -29,7 +32,6 @@ public class SellerOrderController {
     @GetMapping("/orders")
     public ResponseEntity<List<OrderDTO>> getSellerOrders(@RequestParam Long sellerId) {
 
-        // Long sellerId = 1L;
         List<OrderDTO> orders = sellerOrderService.getOrdersBySellerId(sellerId);
         return ResponseEntity.ok(orders);
     }
@@ -45,14 +47,15 @@ public class SellerOrderController {
     }
 
 
+
     // filter by most/least products for seller
     @GetMapping("/products/stats")
     public ResponseEntity<List<SellerProductDetailsDTO>> getProductsBySalesCount(
             @RequestParam(value = "sort", defaultValue = "desc") String sortOrder) {
 
+
         Long sellerId = 1L;
         List<SellerProductDetailsDTO> products = sellerOrderService.getProductsStatsSorted(sellerId, sortOrder);
         return ResponseEntity.ok(products);
     }
-
 }
