@@ -29,9 +29,17 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Integer getTotalOrdersByProductId(@Param("productId") Long productId);
 
 
-    @Query("SELECT oi.product.id, oi.product.name, SUM(oi.quantity) " +
+    /*@Query("SELECT oi.product.id, oi.product.name, SUM(oi.quantity) " +
             "FROM OrderItem oi WHERE oi.product.seller.id = :sellerId " +
             "GROUP BY oi.product.id, oi.product.name")
+    List<Object[]> getProductSalesStats(@Param("sellerId") Long sellerId);*/
+
+    @Query(value = "SELECT oi.product_id, p.name, SUM(oi.quantity) as q " +
+            "FROM OrderItem oi " +
+            "JOIN Product p ON oi.product_id = p.id " +
+            "WHERE p.seller_id = :sellerId " +
+            "GROUP BY oi.product_id, p.name",
+            nativeQuery = true)
     List<Object[]> getProductSalesStats(@Param("sellerId") Long sellerId);
 
 }
