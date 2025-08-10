@@ -28,30 +28,25 @@ public class OrderController {
 
     @PostMapping("/checkout")
     public ResponseEntity<?> checkout(HttpServletRequest request) {
-        try {
-            // extract user ID from JWT in request header
-            Long userId = jwtService.extractUserIdFromRequest(request);
 
-            // process the checkout
-            orderService.checkout(userId);
+        // extract user ID from JWT in request header
+        Long userId = jwtService.extractUserIdFromRequest(request);
 
-            return ResponseEntity.ok("Checkout successful!");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error during checkout: " + e.getMessage());
-        }
+        // process the checkout
+        orderService.checkout(userId);
+
+        return ResponseEntity.ok("Checkout successful!");
     }
 
     @GetMapping("/orders")
     public ResponseEntity<?> getOrderHistory(HttpServletRequest request) {
-        try {
-            // extract user ID from JWT in request header
-            Long userId = jwtService.extractUserIdFromRequest(request);
 
-            // get order history for the user
-            List<OrderResponse> orderHistory = orderService.getOrderHistory(userId);
-            return ResponseEntity.ok(orderHistory);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error fetching order history: " + e.getMessage());
-        }
+        // extract user ID from JWT in request header
+        Long userId = jwtService.extractUserIdFromRequest(request);
+
+        // get order history for the user
+        List<OrderResponse> orderHistory = orderService.getOrderHistory(userId);
+
+        return ResponseEntity.ok(orderHistory);
     }
 }

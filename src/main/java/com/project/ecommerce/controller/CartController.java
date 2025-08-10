@@ -28,59 +28,50 @@ public class CartController {
 
     @GetMapping("/items")
     public ResponseEntity<?> getCartItems(HttpServletRequest request) {
-        try {
-            // extract user ID from JWT in request header
-            Long userId = jwtService.extractUserIdFromRequest(request);
 
-            // get cart items for the user
-            List<CartItemResponse> cartItems = cartService.getCartItemsResponse(userId);
+        // extract user ID from JWT in request header
+        Long userId = jwtService.extractUserIdFromRequest(request);
 
-            return ResponseEntity.ok(cartItems);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error adding item to cart: " + e.getMessage());
-        }
+        // get cart items for the user
+        List<CartItemResponse> cartItems = cartService.getCartItemsResponse(userId);
+
+        return ResponseEntity.ok(cartItems);
     }
 
     @PostMapping("/add")
     public ResponseEntity<?> addToCart(@Valid @RequestBody CartItemRequest cartItemRequest, HttpServletRequest request) {
-        try {
-            // extract user ID from JWT in request header
-            Long userId = jwtService.extractUserIdFromRequest(request);
 
-            // add item to cart
-            cartService.addToCart(userId, cartItemRequest);
+        // extract user ID from JWT in request header
+        Long userId = jwtService.extractUserIdFromRequest(request);
 
-            return ResponseEntity.ok("Item added to cart successfully!");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error adding item to cart: " + e.getMessage());
-        }
+        // add item to cart
+        cartService.addToCart(userId, cartItemRequest);
+
+        return ResponseEntity.ok("Item added to cart successfully!");
     }
 
     @DeleteMapping("/remove/{productId}")
     public ResponseEntity<?> removeFromCart(@PathVariable Long productId, HttpServletRequest request) {
-        try {
-            // extract user ID from JWT in request header
-            Long userId = jwtService.extractUserIdFromRequest(request);
 
-            // remove cart item for user
-            cartService.removeFromCart(userId, productId);
-            return ResponseEntity.ok("Item removed from cart successfully!");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error removing item from cart: " + e.getMessage());
-        }
+        // extract user ID from JWT in request header
+        Long userId = jwtService.extractUserIdFromRequest(request);
+
+        // remove cart item for user
+        cartService.removeFromCart(userId, productId);
+
+        return ResponseEntity.ok("Item removed from cart successfully!");
     }
 
     @DeleteMapping("/clear")
     public ResponseEntity<?> clearCart(HttpServletRequest request) {
-        try {
-            // extract user ID from JWT in request header
-            Long userId = jwtService.extractUserIdFromRequest(request);
 
-            // clear all cart items for the user
-            cartService.clearCart(userId);
-            return ResponseEntity.ok("Cart cleared successfully!");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error clearing cart: " + e.getMessage());
-        }
+        // extract user ID from JWT in request header
+        Long userId = jwtService.extractUserIdFromRequest(request);
+
+        // clear all cart items for the user
+        cartService.clearCart(userId);
+
+        return ResponseEntity.ok("Cart cleared successfully!");
+
     }
 }
