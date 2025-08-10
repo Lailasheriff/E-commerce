@@ -1,11 +1,16 @@
 package com.project.ecommerce.dto;
 
 import jakarta.validation.constraints.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class ProductRequest {
-
         @NotBlank(message = "Product name is required")
         @Size(min = 2, max = 100, message = "Product name must be between 2 and 100 characters")
         private String name;
@@ -23,46 +28,4 @@ public class ProductRequest {
 
         @NotBlank(message = "Image URL is required")
         private String imageUrl;
-
-    // getters and setters
-    public String getName() {
-        return name;
-    }
-    public void setName(String name) {
-        this.name = name;
-    }
-    public String getDescription() {
-        return description;
-    }
-    public void setDescription(String description) {
-        this.description = description;
-    }
-    public BigDecimal getPrice() {
-        return price;
-    }
-    public void setPrice(BigDecimal price) {
-        this.price = price;
-    }
-    public int getQuantity() {
-        return quantity;
-    }
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
-    }
-    public String getImageUrl() {
-        return imageUrl;
-    }
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
-    @Override
-    public String toString() {
-        return "ProductRequest{" +
-                "name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", price=" + price +
-                ", quantityAvailable=" + quantity +
-                ", imageUrl='" + imageUrl + '\'' +
-                '}';
-    }
 }
