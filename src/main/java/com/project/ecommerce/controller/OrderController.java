@@ -17,8 +17,8 @@ import java.util.List;
 @RequestMapping("/buyer")
 public class OrderController {
 
-    private OrderService orderService;
-    private JwtService jwtService;
+    private final OrderService orderService;
+    private final JwtService jwtService;
 
     @Autowired
     public OrderController(OrderService orderService, JwtService jwtService) {
