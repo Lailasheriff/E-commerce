@@ -28,11 +28,11 @@ public class SellerOrderServiceImpl implements SellerOrderService {
     private ReviewRepository reviewRepository;
 
     @Override
-    public ProductDetailsDTO getProductDetailsById(Long productId) {
+    public SellerProductDetailsDTO getProductDetailsById(Long productId) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ProductNotFoundException(productId));
 
-        ProductDetailsDTO dto = new ProductDetailsDTO();
+        SellerProductDetailsDTO dto = new SellerProductDetailsDTO();
         dto.setId(product.getId());
         dto.setName(product.getName());
         dto.setDescription(product.getDescription());
@@ -122,16 +122,16 @@ public class SellerOrderServiceImpl implements SellerOrderService {
 
 
     @Override
-    public List<ProductDetailsDTO> getProductsStatsSorted(Long sellerId, String sortBy) {
+    public List<SellerProductDetailsDTO> getProductsStatsSorted(Long sellerId, String sortBy) {
         List<Object[]> stats = productRepository.getProductSalesStats(sellerId);
-        List<ProductDetailsDTO> list = new ArrayList<>();
+        List<SellerProductDetailsDTO> list = new ArrayList<>();
 
         for (Object[] row : stats) {
             Long productId = (Long) row[0];
             String name = (String) row[1];
             Long quantitySold = (Long) row[2];
 
-            ProductDetailsDTO dto = new ProductDetailsDTO();
+            SellerProductDetailsDTO dto = new SellerProductDetailsDTO();
             dto.setId(productId);
             dto.setName(name);
             dto.setQuantitySold(quantitySold.intValue());
@@ -140,11 +140,11 @@ public class SellerOrderServiceImpl implements SellerOrderService {
         }
 
         if ("asc".equalsIgnoreCase(sortBy)) {
-            list.sort(Comparator.comparingInt(ProductDetailsDTO::getQuantitySold));
+            list.sort(Comparator.comparingInt(SellerProductDetailsDTO::getQuantitySold));
         }
 
         else {
-            list.sort(Comparator.comparingInt(ProductDetailsDTO::getQuantitySold).reversed());
+            list.sort(Comparator.comparingInt(SellerProductDetailsDTO::getQuantitySold).reversed());
         }
 
         return list;

@@ -21,12 +21,13 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findAllBySellerId(Long sellerId);
 
 
-
     @Query("SELECT SUM(oi.quantity) FROM OrderItem oi WHERE oi.product.id = :productId")
     Integer getTotalQuantitySoldByProductId(@Param("productId") Long productId);
 
+
     @Query("SELECT COUNT(DISTINCT o.id) FROM Order o JOIN o.items oi WHERE oi.product.id = :productId")
     Integer getTotalOrdersByProductId(@Param("productId") Long productId);
+
 
     @Query("SELECT oi.product.id, oi.product.name, SUM(oi.quantity) " +
             "FROM OrderItem oi WHERE oi.product.seller.id = :sellerId " +

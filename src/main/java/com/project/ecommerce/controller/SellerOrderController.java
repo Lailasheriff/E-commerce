@@ -1,11 +1,9 @@
 package com.project.ecommerce.controller;
 import com.project.ecommerce.dto.OrderDTO;
-import com.project.ecommerce.dto.OrderResponse;
-import com.project.ecommerce.dto.ProductDetailsDTO;
+import com.project.ecommerce.dto.SellerProductDetailsDTO;
 import com.project.ecommerce.service.SellerOrderService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
@@ -20,18 +18,18 @@ public class SellerOrderController {
 
     // view product details
     @GetMapping("/products/{productId}")
-    public ResponseEntity<ProductDetailsDTO> getProductDetails(@PathVariable("productId") Long productId) {
+    public ResponseEntity<SellerProductDetailsDTO> getProductDetails(@PathVariable("productId") Long productId) {
 
-        ProductDetailsDTO productDetails = sellerOrderService.getProductDetailsById(productId);
+        SellerProductDetailsDTO productDetails = sellerOrderService.getProductDetailsById(productId);
         return ResponseEntity.ok(productDetails);
     }
 
 
     // view orders history for seller
     @GetMapping("/orders")
-    public ResponseEntity<List<OrderDTO>> getSellerOrders() {
+    public ResponseEntity<List<OrderDTO>> getSellerOrders(@RequestParam Long sellerId) {
 
-        Long sellerId = 1L;
+        // Long sellerId = 1L;
         List<OrderDTO> orders = sellerOrderService.getOrdersBySellerId(sellerId);
         return ResponseEntity.ok(orders);
     }
@@ -49,11 +47,11 @@ public class SellerOrderController {
 
     // filter by most/least products for seller
     @GetMapping("/products/stats")
-    public ResponseEntity<List<ProductDetailsDTO>> getProductsBySalesCount(
+    public ResponseEntity<List<SellerProductDetailsDTO>> getProductsBySalesCount(
             @RequestParam(value = "sort", defaultValue = "desc") String sortOrder) {
 
         Long sellerId = 1L;
-        List<ProductDetailsDTO> products = sellerOrderService.getProductsStatsSorted(sellerId, sortOrder);
+        List<SellerProductDetailsDTO> products = sellerOrderService.getProductsStatsSorted(sellerId, sortOrder);
         return ResponseEntity.ok(products);
     }
 
