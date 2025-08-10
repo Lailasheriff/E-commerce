@@ -73,4 +73,14 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponseDTO> handleReviewNotAllowed(ReviewNotAllowedException ex) {
         return buildErrorResponse(ex.getMessage(), HttpStatus.FORBIDDEN);
     }
+
+    @ExceptionHandler(OrderNotFoundException.class)
+    public ResponseEntity<ErrorResponseDTO> handleOrderNotFound(OrderNotFoundException ex) {
+        return buildErrorResponse(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(InvalidOrderStatusException.class)
+    public ResponseEntity<ErrorResponseDTO> handleInvalidOrderStatus(InvalidOrderStatusException ex) {
+        return buildErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
 }

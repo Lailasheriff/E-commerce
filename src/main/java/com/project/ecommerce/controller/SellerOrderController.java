@@ -17,57 +17,43 @@ public class SellerOrderController {
         this.sellerOrderService = sellerOrderService;
     }
 
-
+    // view product details
     @GetMapping("/products/{productId}")
     public ResponseEntity<ProductDetailsDTO> getProductDetails(@PathVariable("productId") Long productId) {
-        try {
-            ProductDetailsDTO productDetails = sellerOrderService.getProductDetailsById(productId);
-            return ResponseEntity.ok(productDetails);
-        }
 
-        catch (Exception e) {
-            return ResponseEntity.badRequest().body(null);
-        }
+        ProductDetailsDTO productDetails = sellerOrderService.getProductDetailsById(productId);
+        return ResponseEntity.ok(productDetails);
     }
 
 
+    // view orders history for seller
     @GetMapping("/orders")
     public ResponseEntity<List<OrderResponse>> getSellerOrders() {
-        try {
-            Long sellerId = 1L;
-            List<OrderResponse> orders = sellerOrderService.getOrdersBySellerId(sellerId);
-            return ResponseEntity.ok(orders);
-        }
 
-        catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
+        Long sellerId = 1L;
+        List<OrderResponse> orders = sellerOrderService.getOrdersBySellerId(sellerId);
+        return ResponseEntity.ok(orders);
     }
 
 
+    // update order status
     @PutMapping("/orders/{orderId}")
     public ResponseEntity<String> updateOrderStatus(@PathVariable("orderId") Long orderId,
                                                     @RequestParam("status") String status) {
-        try {
-            String result = sellerOrderService.updateOrderStatus(orderId, status);
-            return ResponseEntity.ok(result);
-        }
 
-        catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error updating order status: " + e.getMessage());
-        }
+        String result = sellerOrderService.updateOrderStatus(orderId, status);
+        return ResponseEntity.ok(result);
     }
 
 
+    // filter by most/least products for seller
     @GetMapping("/products/stats")
     public ResponseEntity<List<ProductDetailsDTO>> getProductsBySalesCount(
             @RequestParam(value = "sort", defaultValue = "desc") String sortOrder) {
-        try {
-            Long sellerId = 1L;
-            List<ProductDetailsDTO> products = sellerOrderService.getProductsStatsSorted(sellerId, sortOrder);
-            return ResponseEntity.ok(products);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
+
+        Long sellerId = 1L;
+        List<ProductDetailsDTO> products = sellerOrderService.getProductsStatsSorted(sellerId, sortOrder);
+        return ResponseEntity.ok(products);
     }
+
 }

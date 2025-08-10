@@ -13,6 +13,8 @@ public class ProductDetailsDTO {
     private int totalReviews;
     private List<ReviewDTO> reviewDTOS;
     private String imageUrl;
+    private int quantitySold;
+    private int totalOrders;
 
     public ProductDetailsDTO() {}
 
@@ -36,13 +38,7 @@ public class ProductDetailsDTO {
         this.imageUrl = imageUrl;
     }
 
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
+    // Getters and setters
 
     public Long getId() {
         return id;
@@ -106,5 +102,29 @@ public class ProductDetailsDTO {
 
     public void setReviews(List<ReviewDTO> reviewDTOS) {
         this.reviewDTOS = reviewDTOS;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public int getQuantitySold() {
+        return quantitySold;
+    }
+
+    public void setQuantitySold(int quantitySold) {
+        this.quantitySold = quantitySold;
+    }
+
+    public int getTotalOrders() {
+        return totalOrders;
+    }
+
+    public void setTotalOrders(int totalOrders) {
+        this.totalOrders = totalOrders;
     }
 }

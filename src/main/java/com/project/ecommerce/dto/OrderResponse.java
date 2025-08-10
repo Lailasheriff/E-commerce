@@ -17,11 +17,13 @@ public class OrderResponse {
     private LocalDateTime orderDate;
     List<OrderItemResponse> orderItems;
     private OrderStatus orderStatus;
+    private String buyerName;
 
-    public OrderResponse(Long id, String name, double v, LocalDateTime createdAt, List<OrderItemResponse> itemResponses) {
+    public OrderResponse(Long id, String name, double v, LocalDateTime createdAt, List<OrderItemResponse> itemResponses, String buyerName) {
         this.orderId = id;
         this.orderDate = createdAt;
         this.orderItems = itemResponses;
         this.orderStatus = OrderStatus.PLACED;
+        this.buyerName = buyerName;
     }
 }

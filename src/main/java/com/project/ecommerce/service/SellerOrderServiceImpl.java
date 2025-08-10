@@ -4,6 +4,9 @@ import com.project.ecommerce.dto.OrderItemResponse;
 import com.project.ecommerce.dto.ProductDetailsDTO;
 import com.project.ecommerce.dto.ReviewDTO;
 import com.project.ecommerce.entity.*;
+import com.project.ecommerce.exception.InvalidOrderStatusException;
+import com.project.ecommerce.exception.OrderNotFoundException;
+import com.project.ecommerce.exception.ProductNotFoundException;
 import com.project.ecommerce.repository.OrderRepository;
 import com.project.ecommerce.repository.ProductRepository;
 import com.project.ecommerce.repository.ReviewRepository;
@@ -31,7 +34,7 @@ public class SellerOrderServiceImpl implements SellerOrderService {
     @Override
     public ProductDetailsDTO getProductDetailsById(Long productId) {
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+                .orElseThrow(() -> new ProductNotFoundException("Product not found"));
 
         ProductDetailsDTO dto = new ProductDetailsDTO();
         dto.setId(product.getId());
@@ -53,8 +56,10 @@ public class SellerOrderServiceImpl implements SellerOrderService {
                     review.getUser().getName(),
                     review.getId()
             );
+
             reviewDTOList.add(reviewDTO);
         }
+
         dto.setReviews(reviewDTOList);
 
 
@@ -86,6 +91,7 @@ public class SellerOrderServiceImpl implements SellerOrderService {
                 itemResponse.setProductName(item.getProduct().getName());
                 itemResponse.setQuantity(item.getQuantity());
                 itemResponse.setPrice(item.getProduct().getPrice());
+
                 itemResponses.add(itemResponse);
             });
 
@@ -100,23 +106,20 @@ public class SellerOrderServiceImpl implements SellerOrderService {
 
     @Override
     public String updateOrderStatus(Long orderId, String status) {
-        Optional<Order> optionalOrder = orderRepository.findById(orderId);
 
-        if (!optionalOrder.isPresent()) {
-            throw new RuntimeException("Order not found");
-        }
-
-        Order order = optionalOrder.get();
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new OrderNotFoundException());
 
         try {
             OrderStatus newStatus = OrderStatus.valueOf(status.toUpperCase());
             order.setStatus(newStatus);
             orderRepository.save(order);
+
             return "Order status updated to " + newStatus;
         }
 
         catch (IllegalArgumentException e) {
-            throw new RuntimeException("Invalid order status: " + status);
+            throw new InvalidOrderStatusException("Invalid Order Status");
         }
     }
 
