@@ -1,6 +1,10 @@
 package com.project.ecommerce.filter;
 
 import com.project.ecommerce.entity.Role;
+import com.project.ecommerce.exception.AccessDeniedForBuyerException;
+import com.project.ecommerce.exception.AccessDeniedForSellerException;
+import com.project.ecommerce.exception.InvalidJwtTokenException;
+import com.project.ecommerce.exception.MissingAuthorizationHeaderException;
 import com.project.ecommerce.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -27,7 +31,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         String path = request.getRequestURI();
-        System.out.println(" path is" + path);
         // Skip authentication for /auth endpoints
         if (path.startsWith("/auth")) {
             filterChain.doFilter(request, response);
@@ -38,24 +41,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             String authHeader = request.getHeader("Authorization");
             if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-                throw new RuntimeException("Missing or invalid Authorization header");
+                throw new MissingAuthorizationHeaderException();
             }
 
             String token = authHeader.substring(7); // Remove "Bearer "
 
             if (!jwtService.isTokenValid(token)) {
-                throw new RuntimeException("Invalid JWT token");
+                throw new InvalidJwtTokenException();
             }
 
             Long userId = jwtService.extractId(token);
             Role role = jwtService.extractRole(token);
 
             if(path.startsWith("/seller") && role != Role.SELLER) {
-                throw new RuntimeException("Access denied for non-seller users");
+                throw new AccessDeniedForSellerException();
             }
 
             if(path.startsWith("/buyer") && role != Role.BUYER) {
-                throw new RuntimeException("Access denied for non-buyer users");
+                throw new AccessDeniedForBuyerException();
             }
 
             UsernamePasswordAuthenticationToken authentication =
@@ -67,7 +70,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         } catch (Exception e) {
             System.out.println("JWT Filter Error: " + e.getMessage());
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
         }
     }
 }

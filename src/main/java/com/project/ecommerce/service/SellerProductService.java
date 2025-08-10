@@ -4,6 +4,7 @@ import com.project.ecommerce.dto.ProductRequest;
 import com.project.ecommerce.dto.ProductSummaryDTO;
 import com.project.ecommerce.entity.Product;
 import com.project.ecommerce.entity.User;
+import com.project.ecommerce.exception.*;
 import com.project.ecommerce.repository.OrderItemRepository;
 import com.project.ecommerce.repository.ProductRepository;
 import com.project.ecommerce.repository.UserRepository;
@@ -26,7 +27,8 @@ public class SellerProductService {
 
     public void addProduct(Long sellerId, ProductRequest productRequest) {
         User seller = userRepository.findById(sellerId)
-                .orElseThrow(() -> new RuntimeException("Seller not found with id: " + sellerId));
+                .orElseThrow(() -> new SellerNotFoundException(sellerId));
+
         try{
             Product product = new Product(productRequest.getName(),
                                           productRequest.getDescription(),
@@ -43,12 +45,12 @@ public class SellerProductService {
 
     public void updateProduct(Long sellerId, Long productId, ProductRequest productRequest) {
         User seller = userRepository.findById(sellerId)
-                .orElseThrow(() -> new RuntimeException("Seller not found with id: " + sellerId));
+                .orElseThrow(() -> new SellerNotFoundException(sellerId));
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Product not found with id: " + productId));
+                .orElseThrow(() -> new ProductNotFoundException(productId));
 
         if (!(product.getSeller().getId() == (seller.getId()))) {
-            throw new RuntimeException("You are not authorized to update this product");
+            throw new UnauthorizedProductAccessException();
         }
 
         product.setName(productRequest.getName());
@@ -62,12 +64,12 @@ public class SellerProductService {
 
     public void deleteProduct(Long sellerId, Long productId) {
         User seller = userRepository.findById(sellerId)
-                .orElseThrow(() -> new RuntimeException("Seller not found with id: " + sellerId));
+                .orElseThrow(() -> new SellerNotFoundException(sellerId));
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Product not found with id: " + productId));
+                .orElseThrow(() -> new ProductNotFoundException(productId));
 
         if (!(product.getSeller().getId() == (seller.getId()))) {
-            throw new RuntimeException("You are not authorized to delete this product");
+            throw new UnauthorizedProductAccessException();
         }
 
         productRepository.delete(product);
@@ -75,7 +77,7 @@ public class SellerProductService {
 
     public List<ProductSummaryDTO> getProductsBySeller(Long sellerId) {
         User seller = userRepository.findById(sellerId)
-                .orElseThrow(() -> new RuntimeException("Seller not found with id: " + sellerId));
+                .orElseThrow(() -> new SellerNotFoundException(sellerId));
         List<Product> products = productRepository.findAllBySellerId(sellerId);
         return products.stream()
                 .map(product -> new ProductSummaryDTO(
@@ -88,7 +90,7 @@ public class SellerProductService {
 
     public List<ProductSummaryDTO> searchProductsBySeller(Long sellerId, String query) {
         User seller = userRepository.findById(sellerId)
-                .orElseThrow(() -> new RuntimeException("Seller not found with id: " + sellerId));
+                .orElseThrow(() -> new SellerNotFoundException(sellerId));
         List<Product> products = productRepository.findAllBySellerId(sellerId);
 
         GenericSearchUtil searchUtil = new GenericSearchUtil();
@@ -104,31 +106,35 @@ public class SellerProductService {
 
     public List<ProductSummaryDTO> filterProductsBySeller(Long sellerId, String sortBy, String order) {
         User seller = userRepository.findById(sellerId)
-                .orElseThrow(() -> new RuntimeException("Seller not found with id: " + sellerId));
+                .orElseThrow(() -> new SellerNotFoundException(sellerId));
         List<Product> products = productRepository.findAllBySellerId(sellerId);
 
         if (sortBy.equalsIgnoreCase("price")) {
             if (order.equalsIgnoreCase("asc")) {
                 products.sort((p1, p2) -> p1.getPrice().compareTo(p2.getPrice()));
-            } else {
+            } else if(order.equalsIgnoreCase("asc")) {
                 products.sort((p1, p2) -> p2.getPrice().compareTo(p1.getPrice()));
+            } else{
+                    throw new InvalidSortOrderException(order);
             }
         } else if(sortBy.equalsIgnoreCase("buy-rate")){
                 if (order.equalsIgnoreCase("asc")) {
-
                     products.sort((p1, p2) -> Long.compare(
                             orderItemRepository.countShippedItemsByProductId(p1.getId()),
                             orderItemRepository.countShippedItemsByProductId(p2.getId())
                     ));
-                } else {
+                } else if(order.equalsIgnoreCase("des")) {
                     products.sort((p1, p2) -> Long.compare(
                             orderItemRepository.countShippedItemsByProductId(p2.getId()),
                             orderItemRepository.countShippedItemsByProductId(p1.getId())
                     ));
                 }
+                else{
+                    throw new InvalidSortOrderException(order);
+                }
         }
         else {
-            throw new RuntimeException("Invalid sort parameters");
+            throw new InvalidSortParameterException();
         }
         return products.stream()
                 .map(product -> new ProductSummaryDTO(
