@@ -17,6 +17,4 @@ public interface CartService {
     void removeFromCart(Long userId, Long productId);
 
     void clearCart(Long userId);
-
-    int getCartItemCount(Long userId);
 }

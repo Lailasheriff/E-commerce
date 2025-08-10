@@ -3,7 +3,8 @@ package com.project.ecommerce.dto;
 import java.math.BigDecimal;
 import java.util.List;
 
-public class ProductDetailsDTO {
+public class SellerProductDetailsDTO {
+
     private Long id;
     private String name;
     private String description;
@@ -16,9 +17,9 @@ public class ProductDetailsDTO {
     private int quantitySold;
     private int totalOrders;
 
-    public ProductDetailsDTO() {}
+    public SellerProductDetailsDTO() {}
 
-    public ProductDetailsDTO(Long id, String name, BigDecimal price, double averageRating, int quantityAvailable) {
+    public SellerProductDetailsDTO(Long id, String name, BigDecimal price, double averageRating, int quantityAvailable) {
         this.id = id;
         this.name = name;
         this.price = price;
@@ -26,7 +27,7 @@ public class ProductDetailsDTO {
         this.quantityAvailable = quantityAvailable;
     }
 
-    public ProductDetailsDTO(Long id, String name, String description, BigDecimal price, int quantityAvailable, double averageRating, int totalReviews, List<ReviewDTO> reviewDTOS, String imageUrl) {
+    public SellerProductDetailsDTO(Long id, String name, String description, BigDecimal price, int quantityAvailable, double averageRating, int totalReviews, List<ReviewDTO> reviewDTOS, String imageUrl) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -38,7 +39,6 @@ public class ProductDetailsDTO {
         this.imageUrl = imageUrl;
     }
 
-    // Getters and setters
 
     public Long getId() {
         return id;

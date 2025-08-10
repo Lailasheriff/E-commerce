@@ -3,6 +3,7 @@ package com.project.ecommerce.service;
 import com.project.ecommerce.dto.OrderItemResponse;
 import com.project.ecommerce.dto.OrderResponse;
 import com.project.ecommerce.entity.*;
+import com.project.ecommerce.exception.CartEmptyException;
 import com.project.ecommerce.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -39,7 +40,7 @@ public class OrderServiceImpl implements OrderService {
 
         List<CartItem> cartItems = cartItemRepository.findByBuyerId(buyerId);
         if (cartItems.isEmpty()) {
-            throw new RuntimeException("No cartItems found");
+            throw new CartEmptyException("No cartItems found for check out");
         }
         Order order = new Order();
         order.setBuyer(buyer);

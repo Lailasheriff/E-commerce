@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/buyer")
 public class ReviewController {
 
-    private JwtService jwtService;
-    private ReviewService reviewService;
+    private final JwtService jwtService;
+    private final ReviewService reviewService;
 
     @Autowired
     public ReviewController(JwtService jwtService, ReviewService reviewService) {
@@ -29,16 +29,12 @@ public class ReviewController {
     @PostMapping("/reviews")
     public ResponseEntity<?> createReview(@Valid @RequestBody ReviewRequest reviewRequest, HttpServletRequest request) {
 
-        try {
-            // Extract user ID from JWT in request header
-            Long buyerId = jwtService.extractUserIdFromRequest(request);
+        // Extract user ID from JWT in request header
+        Long buyerId = jwtService.extractUserIdFromRequest(request);
 
-            // Submit the review
-            reviewService.submitReview(buyerId, reviewRequest);
+        // Submit the review
+        reviewService.submitReview(buyerId, reviewRequest);
 
-            return ResponseEntity.ok("Review submitted successfully!");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error submitting review: " + e.getMessage());
-        }
+        return ResponseEntity.ok("Review submitted successfully!");
     }
 }
