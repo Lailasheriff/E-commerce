@@ -18,4 +18,5 @@ public interface CartService {
 
     void clearCart(Long userId);
 
+    int getCartItemCount(Long userId);
 }

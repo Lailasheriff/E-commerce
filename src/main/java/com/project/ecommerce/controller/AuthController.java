@@ -35,27 +35,30 @@ public class AuthController {
 
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@Valid @RequestBody SignupRequest signupRequest) {
+        try {
+            // get fields from request body
+            String name = signupRequest.getName();
+            String email = signupRequest.getEmail();
+            String password = signupRequest.getPassword();
+            Role role = signupRequest.getRole();
 
-        // get fields from request body
-        String name = signupRequest.getName();
-        String email = signupRequest.getEmail();
-        String password = signupRequest.getPassword();
-        Role role = signupRequest.getRole();
+            // check if email already exists
+            if (userRepository.existsByEmail(email)) {
+                return ResponseEntity.badRequest().body("Email already exists!");
+            }
 
-        // check if email already exists
-        if (userRepository.existsByEmail(email)) {
-            throw new IllegalArgumentException("Email already exists!");
+            // get hashed password
+            String encodedPassword = passwordEncoder.encode(password);
+
+            // create and save user
+            User user = new User(name, email, encodedPassword, role);
+            userRepository.save(user);
+
+            // return success response
+            return ResponseEntity.ok("User registered successfully!");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error registering user: " + e.getMessage());
         }
-
-        // get hashed password
-        String encodedPassword = passwordEncoder.encode(password);
-
-        // create and save user
-        User user = new User(name, email, encodedPassword, role);
-        userRepository.save(user);
-
-        // return success response
-        return ResponseEntity.ok("User registered successfully!");
     }
 
     @PostMapping("/login")
@@ -64,17 +67,19 @@ public class AuthController {
         // looks for the user by email
         Optional<User> potentialUser = userRepository.findByEmail(loginRequest.getEmail());
 
+        // returns 401 unauthorized if not found
         if (potentialUser.isEmpty()) {
-            throw new IllegalArgumentException("Invalid email or password!");
+            return  ResponseEntity.status(401).body("Invalid email or password!");
         }
 
         User user = potentialUser.get();
         // compares entered password with stored hashed password
+        // returns 401 unauthorized if it doesn't match
         if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
-            throw new IllegalArgumentException("Invalid password!");
+            return  ResponseEntity.status(401).body("Invalid password!");
         }
 
-        String token = jwtService.generateToken(user.getId(), user.getRole());
+        String token = jwtService.generateToken(user.getId(),user.getRole());
 
         return ResponseEntity.ok(new AuthResponse(token));
     }
