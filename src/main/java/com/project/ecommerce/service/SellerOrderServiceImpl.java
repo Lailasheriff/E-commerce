@@ -33,7 +33,7 @@ public class SellerOrderServiceImpl implements SellerOrderService {
     @Override
     public ProductDetailsDTO getProductDetailsById(Long productId) {
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new ProductNotFoundException("Product not found"));
+                .orElseThrow(() -> new ProductNotFoundException(productId));
 
         ProductDetailsDTO dto = new ProductDetailsDTO();
         dto.setId(product.getId());
