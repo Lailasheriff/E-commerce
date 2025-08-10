@@ -47,7 +47,7 @@ public class CartServiceImpl implements CartService {
     public List<CartItemResponse> getCartItemsResponse(Long userId) {
         return getCartItems(userId).stream()
                 .map(cartItem -> new CartItemResponse(
-                        cartItem.getId(),
+                       // cartItem.getId(),
                         cartItem.getProduct().getId(),
                         cartItem.getProduct().getName(),
                         cartItem.getProduct().getPrice(),
