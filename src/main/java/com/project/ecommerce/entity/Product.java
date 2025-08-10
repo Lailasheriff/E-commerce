@@ -1,9 +1,9 @@
 package com.project.ecommerce.entity;
 
 import jakarta.persistence.*;
-import java.math.BigDecimal;
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
+
+import java.math.BigDecimal;
 import java.util.List;
 
 @Entity
@@ -25,9 +25,6 @@ public class Product {
     @Column(name="quantity")
     private int quantity;
 
-    @Column(name = "created_at")
-    private LocalDateTime createdAt = LocalDateTime.now();
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seller_id", nullable = false)
     private User seller;
@@ -35,6 +32,8 @@ public class Product {
     @Column(name = "image_url")
     private String imageUrl;
 
+    @Column(name = "created_at")
+    private Timestamp createdAt;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     private List<Review> reviews;
@@ -65,6 +64,14 @@ public class Product {
 
     public void setReviews(List<Review> reviews) {
         this.reviews = reviews;
+    }
+
+    public Timestamp getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
     }
 
     public User getSeller() {
@@ -123,10 +130,6 @@ public class Product {
         this.imageUrl = imageUrl;
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
     @Override
     public String toString() {
         return "Product{" +
@@ -137,7 +140,24 @@ public class Product {
                 ", quantity=" + quantity +
                 ", seller=" + seller +
                 ", imageUrl='" + imageUrl + '\'' +
+                ", createdAt=" + createdAt +
                 ", reviews=" + reviews +
                 '}';
     }
+
+    public double getAverageRating() {
+        if (reviews == null || reviews.isEmpty()) {
+            return 0.0;
+        }
+        double sum = 0.0;
+        for (Review review : reviews) {
+            sum += review.getRating();
+        }
+        return sum / reviews.size();
+    }
+
+    public int getTotalReviews() {
+        return (reviews != null) ? reviews.size() : 0;
+    }
+
 }
