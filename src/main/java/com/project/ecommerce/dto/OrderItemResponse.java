@@ -13,6 +13,5 @@ public class OrderItemResponse {
 
     private String productName;
     private int quantity;
-    private BigDecimal price;
-    private Long productId;
+    private double price;
 }
