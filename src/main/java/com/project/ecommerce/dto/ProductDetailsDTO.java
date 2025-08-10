@@ -1,9 +1,12 @@
 package com.project.ecommerce.dto;
 
+import com.fasterxml.jackson.annotation.JsonView;
+
 import java.math.BigDecimal;
 import java.util.List;
 
 public class ProductDetailsDTO {
+
     private Long id;
     private String name;
     private String description;
@@ -13,8 +16,7 @@ public class ProductDetailsDTO {
     private int totalReviews;
     private List<ReviewDTO> reviewDTOS;
     private String imageUrl;
-    private int quantitySold;
-    private int totalOrders;
+
 
     public ProductDetailsDTO() {}
 
@@ -37,6 +39,8 @@ public class ProductDetailsDTO {
         this.reviewDTOS = reviewDTOS;
         this.imageUrl = imageUrl;
     }
+
+
 
     // Getters and setters
 
@@ -112,19 +116,4 @@ public class ProductDetailsDTO {
         this.imageUrl = imageUrl;
     }
 
-    public int getQuantitySold() {
-        return quantitySold;
-    }
-
-    public void setQuantitySold(int quantitySold) {
-        this.quantitySold = quantitySold;
-    }
-
-    public int getTotalOrders() {
-        return totalOrders;
-    }
-
-    public void setTotalOrders(int totalOrders) {
-        this.totalOrders = totalOrders;
-    }
 }

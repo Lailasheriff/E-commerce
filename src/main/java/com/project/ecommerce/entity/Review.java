@@ -1,6 +1,7 @@
 package com.project.ecommerce.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.sql.Timestamp;
 
@@ -27,6 +28,7 @@ public class Review {
     @Column(name="comment",columnDefinition = "TEXT")
     private String comment;
 
+    @CreationTimestamp
     @Column(name = "created_at")
     private Timestamp createdAt;
 

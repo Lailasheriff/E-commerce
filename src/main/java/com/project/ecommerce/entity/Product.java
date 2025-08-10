@@ -1,9 +1,12 @@
 package com.project.ecommerce.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
+
 import java.sql.Timestamp;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -32,6 +35,7 @@ public class Product {
     @Column(name = "image_url")
     private String imageUrl;
 
+    @CreationTimestamp
     @Column(name = "created_at")
     private Timestamp createdAt;
 
