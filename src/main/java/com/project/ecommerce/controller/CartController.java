@@ -17,8 +17,8 @@ import java.util.List;
 @RequestMapping("/buyer/cart")
 public class CartController {
 
-    private CartService cartService;
-    private JwtService jwtService;
+    private final CartService cartService;
+    private final JwtService jwtService;
 
     @Autowired
     public CartController(CartService cartService, JwtService jwtService) {

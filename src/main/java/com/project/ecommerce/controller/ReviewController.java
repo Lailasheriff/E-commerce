@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/buyer")
 public class ReviewController {
 
-    private JwtService jwtService;
-    private ReviewService reviewService;
+    private final JwtService jwtService;
+    private final ReviewService reviewService;
 
     @Autowired
     public ReviewController(JwtService jwtService, ReviewService reviewService) {
