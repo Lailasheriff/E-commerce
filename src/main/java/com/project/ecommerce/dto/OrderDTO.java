@@ -19,12 +19,4 @@ public class OrderDTO {
     List<OrderItemDTO> orderItems;
     private OrderStatus orderStatus;
     private String buyerName;
-
-    public OrderDTO(Long id, String name, double v, LocalDateTime createdAt, List<OrderItemDTO> itemResponses, String buyerName) {
-        this.orderId = id;
-        this.orderDate = createdAt;
-        this.orderItems = itemResponses;
-        this.orderStatus = OrderStatus.PLACED;
-        this.buyerName = buyerName;
-    }
 }
