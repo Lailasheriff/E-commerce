@@ -1,8 +1,5 @@
 package com.project.ecommerce.service;
-import com.project.ecommerce.dto.OrderResponse;
-import com.project.ecommerce.dto.OrderItemResponse;
-import com.project.ecommerce.dto.ProductDetailsDTO;
-import com.project.ecommerce.dto.ReviewDTO;
+import com.project.ecommerce.dto.*;
 import com.project.ecommerce.entity.*;
 import com.project.ecommerce.exception.InvalidOrderStatusException;
 import com.project.ecommerce.exception.OrderNotFoundException;
@@ -33,7 +30,7 @@ public class SellerOrderServiceImpl implements SellerOrderService {
     @Override
     public ProductDetailsDTO getProductDetailsById(Long productId) {
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new ProductNotFoundException("Product not found"));
+                .orElseThrow(() -> new ProductNotFoundException(productId));
 
         ProductDetailsDTO dto = new ProductDetailsDTO();
         dto.setId(product.getId());
@@ -72,20 +69,20 @@ public class SellerOrderServiceImpl implements SellerOrderService {
 
 
     @Override
-    public List<OrderResponse> getOrdersBySellerId(Long sellerId) {
+    public List<OrderDTO> getOrdersBySellerId(Long sellerId) {
         List<Order> orders = orderRepository.findOrdersBySellerId(sellerId);
-        List<OrderResponse> responseList = new ArrayList<>();
+        List<OrderDTO> responseList = new ArrayList<>();
 
         for (Order order : orders) {
-            OrderResponse response = new OrderResponse();
+            OrderDTO response = new OrderDTO();
             response.setOrderId(order.getId());
             response.setOrderDate(order.getCreatedAt());
             response.setOrderStatus(order.getStatus());
             response.setBuyerName(order.getBuyer().getName());
 
-            List<OrderItemResponse> itemResponses = new ArrayList<>();
+            List<OrderItemDTO> itemResponses = new ArrayList<>();
             order.getItems().forEach(item -> {
-                OrderItemResponse itemResponse = new OrderItemResponse();
+                OrderItemDTO itemResponse = new OrderItemDTO();
                 itemResponse.setProductId(item.getProduct().getId());
                 itemResponse.setProductName(item.getProduct().getName());
                 itemResponse.setQuantity(item.getQuantity());
