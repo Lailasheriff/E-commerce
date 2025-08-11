@@ -118,6 +118,12 @@ public class CartServiceImpl implements CartService {
         User buyer = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
 
+        List<CartItem> cartItems = cartItemRepository.findByBuyer(buyer);
+        for (CartItem cartItem : cartItems) {
+            Product product = cartItem.getProduct();
+            product.setQuantity(product.getQuantity() + cartItem.getQuantity());
+            productRepository.save(product);
+        }
         cartItemRepository.deleteByBuyer(buyer);
     }
 
