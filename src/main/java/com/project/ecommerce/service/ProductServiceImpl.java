@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.Comparator;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class ProductServiceImpl implements ProductService{
     private final ProductRepository productRepository;
     private final ReviewRepository reviewRepository;
@@ -46,7 +48,7 @@ public class ProductServiceImpl implements ProductService{
         return toProductDetailsDTO(product, reviews);
     }
 
-    @Override
+   /* @Override
     public List<ProductDetailsDTO> searchProducts(String query) {
 
         if (query == null || query.trim().isEmpty()) {
@@ -62,6 +64,12 @@ public class ProductServiceImpl implements ProductService{
                     return toProductDetailsDTO(product, reviews);
                 })
                 .collect(Collectors.toList());
+    }*/
+
+    @Override
+    public Page<ProductDetailsDTO> searchProducts(String query, Pageable pageable) {
+        return productRepository.search(query, pageable)
+                .map(product -> toProductDetailsDTO(product, product.getReviews()));
     }
 
     @Override

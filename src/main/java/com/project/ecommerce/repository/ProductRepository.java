@@ -17,6 +17,19 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     @Query("SELECT new com.project.ecommerce.dto.ProductSummaryDTO(p.id, p.name, p.price, p.imageUrl) FROM Product p")
     Page<ProductSummaryDTO> findAllProductSummaries(Pageable pageable);
+
+    @Query("""
+    SELECT DISTINCT p FROM Product p
+    LEFT JOIN FETCH p.reviews r
+    WHERE 
+        LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
+        OR LOWER(p.description) LIKE LOWER(CONCAT('%', :keyword, '%'))
+        OR CAST(p.price AS string) LIKE CONCAT('%', :keyword, '%')
+        OR CAST(p.quantity AS string) LIKE CONCAT('%', :keyword, '%')
+        OR CAST(p.id AS string) LIKE CONCAT('%', :keyword, '%')
+        """)
+    Page<Product> search(@Param("keyword") String keyword, Pageable pageable);
+
     List<Product> findBySellerId(Long sellerId);
     List<Product> findAllBySellerId(Long sellerId);
 

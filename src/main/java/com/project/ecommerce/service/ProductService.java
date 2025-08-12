@@ -12,6 +12,7 @@ import java.util.List;
 public interface ProductService {
     Page<ProductSummaryDTO> getAllProductSummaries(Pageable pageable);
     ProductDetailsDTO getProductDetailsWithReviews(Long productId);
-    List<ProductDetailsDTO> searchProducts(String query);
+    //List<ProductDetailsDTO> searchProducts(String query);
+    Page<ProductDetailsDTO> searchProducts(String query,Pageable pageable);
     List<ProductDetailsDTO> getAllProductDetailsSorted(String sortBy, String direction);
 }

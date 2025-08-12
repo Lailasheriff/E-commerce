@@ -58,6 +58,18 @@ public class ProductController {
     }
 
     @GetMapping("/products/search")
+    public Page<ProductDetailsDTO> searchProducts(
+            @RequestParam(name = "query", required = false) String query,
+            @PageableDefault(size = 10) Pageable pageable,HttpServletRequest request
+    ) {
+        if (!request.getParameterMap().containsKey("query")) {
+            throw new MissingSearchParameterException("Missing required parameter: query");
+        }
+        return productService.searchProducts(query, pageable);
+    }
+
+
+   /* @GetMapping("/products/search")
     public ResponseEntity<List<ProductDetailsDTO>> searchProducts(@RequestParam(name = "query", required = false) String query,
                                                                   HttpServletRequest request
     ) {
@@ -67,6 +79,8 @@ public class ProductController {
         List<ProductDetailsDTO> results = productService.searchProducts(query);
         return ResponseEntity.ok(results);
     }
+
+    */
 
 
 }
